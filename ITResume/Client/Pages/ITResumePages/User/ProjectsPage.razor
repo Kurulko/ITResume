@@ -1,0 +1,93 @@
+﻿@page "/projects"
+@using Syncfusion.Blazor.DropDowns
+@inherits _UserLayout
+
+
+@if (allLanguages is not null)
+{
+    <CascadingValue Value="20" Name="PageSize">
+        <ComplexEditITResumeDbModels Service="ProjectService" TModel="Project" Context="project" GetModels="@(us => us.GetUserProjectsAsync())">
+            <ChildContent>
+                <GridColumns>
+                    <GridColumn Field=@nameof(Project.Id) AllowAdding="false" />
+                    <GridColumn Field=@nameof(Project.Name) />
+                    <GridColumn Field=@nameof(Project.Github) />
+                    <GridColumn Field=@nameof(Project.WorkExample) />
+                    <GridColumn Field=@nameof(Project.Description)>
+                        <Template>
+                            @((context as Project)!.Description)
+                        </Template>
+                        <EditTemplate>
+                            <SfTextBox @bind-Value="(context as Project)!.Description" Multiline=true />
+                        </EditTemplate>
+                    </GridColumn>
+                    <GridColumn Field=@nameof(Project.StartDoing) />
+                    <GridColumn Field=@nameof(Project.FinishDoing) />
+                    <GridColumn Field=@nameof(Project.ProgrammingLanguages) HeaderText="Programming Languages">
+                        <Template>
+                            @string.Join(",", (context as IEnumerable<ProgrammingLanguage>)?.Select(pl => pl.Name) ?? Enumerable.Empty<string>())
+                        </Template>
+                        <EditTemplate>
+                            @{
+                                Project project = context as Project ?? new();
+
+                                async Task HandleLanguageSelection(MultiSelectChangeEventArgs<IEnumerable<ProgrammingLanguage>> selectedValues)
+                                {
+                                    Console.WriteLine($"NULL?:{selectedValues is null}");
+
+                                    if (selectedValues is not null)
+                                    {
+                                        project.ProgrammingLanguages = selectedValues.Value;
+                                        Console.WriteLine(string.Join(",", project.ProgrammingLanguages.Select(pl => pl.Name)));
+                                        StateHasChanged();
+                                    }
+                                }
+                            }
+                            <span>Programming Languages</span>
+                            @*
+                        <SfMultiSelect TValue="IEnumerable<ProgrammingLanguage>" TItem="ProgrammingLanguage" Placeholder="Select a language" DataSource="@allLanguages"
+                        Value="@project.ProgrammingLanguages" ValueChanged="(IEnumerable<ProgrammingLanguage> value) => project.ProgrammingLanguages = value" Mode="VisualMode.CheckBox">
+                        <MultiSelectFieldSettings Text="@nameof(ProgrammingLanguage.Name)" />
+                        </SfMultiSelect>
+
+                        <SfMultiSelect TValue="IEnumerable<ProgrammingLanguage>" TItem="ProgrammingLanguage" Placeholder="Select a language" DataSource="@allLanguages"
+                        @bind-Value="(context as Project)!.ProgrammingLanguages" Mode="VisualMode.CheckBox">
+                        <MultiSelectFieldSettings Text="@nameof(ProgrammingLanguage.Name)"/>
+                        </SfMultiSelect>
+                        *@
+                            <SfMultiSelect TValue="IEnumerable<ProgrammingLanguage>" TItem="ProgrammingLanguage" Placeholder="Select a language" DataSource="@allLanguages"
+                                       Mode="VisualMode.CheckBox">
+                                <MultiSelectEvents TValue="IEnumerable<ProgrammingLanguage>" TItem="ProgrammingLanguage" ValueChange="@HandleLanguageSelection" />
+                                <MultiSelectFieldSettings Text="@nameof(ProgrammingLanguage.Name)" />
+                            </SfMultiSelect>
+
+                            <MultiSelect AllItems="allLanguages" Placeholder="Select a language" Title="Programming Languages" TextFieldStr="@nameof(ProgrammingLanguage.Name)"
+                                     SaveAsync="@(languages => Task.FromResult(project.ProgrammingLanguages = languages))" CurrentValues="project.ProgrammingLanguages" />
+
+                        </EditTemplate>
+                    </GridColumn>
+                </GridColumns>
+            </ChildContent>
+            <RowDetails>
+                <td colspan="6">@project.Description</td>
+            </RowDetails>
+        </ComplexEditITResumeDbModels>
+    </CascadingValue>
+}
+
+
+@code {
+    IEnumerable<ProgrammingLanguage>? allLanguages;
+
+    [Inject]
+    public IProjectService ProjectService { get; set; } = null!;
+
+    [Inject]
+    public IProgrammingLanguageService ProgrammingLanguageService { get; set; } = null!;
+
+    string DisplayProgrammingLanguages(object context)
+        => string.Join(",", (context as IEnumerable<ProgrammingLanguage>)!.Select(pl => pl.Name));
+
+    protected override async Task OnInitializedAsync()
+        => allLanguages = await ProgrammingLanguageService.GetAllModelsAsync();
+}

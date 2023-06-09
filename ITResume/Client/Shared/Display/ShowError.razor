@@ -1,0 +1,13 @@
+﻿@if (Error is not null)
+{
+    <h3 class="text-danger">@Error</h3>
+}
+@ChildContent
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = null!;
+
+    [Parameter]
+    public string? Error { get; set; }
+}

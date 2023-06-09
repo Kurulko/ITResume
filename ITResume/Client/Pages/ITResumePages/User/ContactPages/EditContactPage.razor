@@ -1,0 +1,78 @@
+﻿@page "/contact/edit"
+@inherits _UserLayout
+
+@if (contact is null)
+{
+    <Spinner />
+}
+else
+{
+    <SimpleForm Model="@contact" DoAction="Action" Mode="@ITResume.Client.Enums.EditMode.Edit.ToString()">
+        <div class="form-group">
+            <DisplayName For="(() => contact.Email)" />
+            <SfTextBox @bind-Value="contact.Email" Placeholder="Email" />
+            <ValidationMessage For="@(() => contact.Email)" />
+        </div>
+        <br />
+        <div class="form-group">
+            <DisplayName For="(() => contact.MobilePhone)" />
+            <SfTextBox @bind-Value="contact.MobilePhone" Placeholder="MobilePhone" />
+            <ValidationMessage For="@(() => contact.MobilePhone)" />
+        </div>
+        <br />
+        <div class="form-group">
+            <DisplayName For="(() => contact.Github)" />
+            <SfTextBox @bind-Value="contact.Github" Placeholder="Github" />
+            <ValidationMessage For="@(() => contact.Github)" />
+        </div>
+        <br />
+        <div class="form-group">
+            <DisplayName For="(() => contact.LinkedId)" />
+            <SfTextBox @bind-Value="contact.LinkedId" Placeholder="LinkedId" />
+            <ValidationMessage For="@(() => contact.LinkedId)" />
+        </div>
+        <br />
+        <div class="form-group">
+            <DisplayName For="(() => contact.Habr)" />
+            <SfTextBox @bind-Value="contact.Habr" Placeholder="Habr" />
+            <ValidationMessage For="@(() => contact.Habr)" />
+        </div>
+        <br />
+        <div class="form-group">
+            <DisplayName For="(() => contact.Stackoverflow)" />
+            <SfTextBox @bind-Value="contact.Stackoverflow" Placeholder="Stackoverflow" />
+            <ValidationMessage For="@(() => contact.Stackoverflow)" />
+        </div>
+        <br />
+        <div class="form-group">
+            <DisplayName For="(() => contact.Telegram)" />
+            <SfTextBox @bind-Value="contact.Telegram" Placeholder="Telegram" />
+            <ValidationMessage For="@(() => contact.Telegram)" />
+        </div>
+        <br />
+    </SimpleForm>
+}
+
+@code {
+    Contact? contact;
+
+    [Inject]
+    public NavigationManager NavManager { get; set; } = null!;
+
+    [Inject]
+    public IContactService ContactService { get; set; } = null!;
+
+    [Inject]
+    public IUserService UserService { get; set; } = null!;
+
+
+    protected override async Task OnInitializedAsync()
+        => contact = await UserService.GetUserContactAsync();
+
+
+    async Task Action()
+    {
+        await ContactService.UpdateModelAsync(contact!);
+        NavManager.NavigateTo("contact");
+    }
+}

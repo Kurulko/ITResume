@@ -1,0 +1,79 @@
+﻿@page "/user/edit"
+@inherits _UserLayout
+
+@if (user is null)
+{
+    <Spinner />
+}
+else
+{
+    <SimpleForm Model="@user" DoAction="Action" Mode="@ITResume.Client.Enums.EditMode.Edit.ToString()">
+        <div class="form-group">
+            <DisplayName For="(() => user.UserName)" />
+            <SfTextBox @bind-Value="user.UserName" Placeholder="UserName" />
+            <ValidationMessage For="@(() => user.UserName)" />
+        </div>
+        <br />
+        <div class="form-group">
+            <DisplayName For="(() => user.Email)" />
+            <SfTextBox @bind-Value="user.Email" Placeholder="Email" />
+            <ValidationMessage For="@(() => user.Email)" />
+        </div>
+        <br />
+        <div class="form-group">
+            <DisplayName For="(() => user.FirstName)" />
+            <SfTextBox @bind-Value="user.FirstName" Placeholder="FirstName" />
+            <ValidationMessage For="@(() => user.FirstName)" />
+        </div>
+        <br />
+        <div class="form-group">
+            <DisplayName For="(() => user.LastName)" />
+            <SfTextBox @bind-Value="user.LastName" Placeholder="LastName" />
+            <ValidationMessage For="@(() => user.LastName)" />
+        </div>
+        <br />
+        <div class="form-group">
+            <DisplayName For="(() => user.FatherName)" />
+            <SfTextBox @bind-Value="user.FatherName" Placeholder="FatherName" />
+            <ValidationMessage For="@(() => user.FatherName)" />
+        </div>
+        <br />
+        <div class="form-group">
+            <DisplayName For="(() => user!.UserDetails!.IsPublicProfile)" />
+            <SfDatePicker @bind-Value="user!.UserDetails!.IsPublicProfile" Placeholder="Is Public" />
+            <ValidationMessage For="@(() => user!.UserDetails!.IsPublicProfile)" />
+        </div>
+        <br />
+        <div class="form-group">
+            <DisplayName For="(() => user.Birthday)" />
+            <SfDatePicker @bind-Value="user.Birthday" Placeholder="Birthday" />
+            <ValidationMessage For="@(() => user.Birthday)" />
+        </div>
+        <br />
+        <div class="form-group">
+            <DisplayName For="(() => user.Registered)" />
+            <SfDatePicker @bind-Value="user.Registered" Placeholder="Registered" />
+            <ValidationMessage For="@(() => user.Registered)" />
+        </div>
+        <br />
+    </SimpleForm>
+}
+
+@code {
+    [Inject]
+    public NavigationManager NavManager { get; set; } = null!;
+
+    [Inject]
+    public IUserService UserService { get; set; } = null!;
+
+    User? user;
+    protected override async Task OnParametersSetAsync()
+        => user = await UserService.GetUserByClaimsAsync(default!);
+
+
+    async Task Action()
+    {
+        await UserService.UpdateModelAsync(user!);
+        NavManager.NavigateTo("user/details");
+    }
+}

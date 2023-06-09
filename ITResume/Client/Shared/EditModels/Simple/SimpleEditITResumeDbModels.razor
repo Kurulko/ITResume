@@ -1,0 +1,6 @@
+﻿@typeparam TModel
+@inherits EditITResumeDbModels<TModel>
+
+<SimpleEditDbModels IdFromModel="@((TModel model) => model.Id)" Service="Service" 
+    ChildContent="ChildContent" RowDetails="RowDetails" GetModels="@(() => GetModels(UserService))" />
+

@@ -1,0 +1,39 @@
+﻿@typeparam T
+
+@using System.Reflection
+@using System.Linq.Expressions;
+@using System.ComponentModel.DataAnnotations;
+
+<label @attributes="Attrs">
+    @if(ChildContent is not null)
+    {
+        @ChildContent
+    }
+    else
+    {
+        @name
+    }
+</label>
+
+@code {
+    string? name;
+
+    [Parameter]
+    public Expression<Func<T>> For { get; set; } = null!;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; } = null!;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> Attrs { get; set; } = null!;
+
+    protected override void OnParametersSet()
+    {
+        if(ChildContent is null)
+        {
+            var expression = (MemberExpression)For.Body;
+            var value = expression.Member.GetCustomAttribute(typeof(DisplayAttribute)) as DisplayAttribute;
+            name = value?.Name ?? expression.Member.Name;
+        }
+    }
+}

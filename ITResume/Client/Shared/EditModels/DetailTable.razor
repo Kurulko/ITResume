@@ -1,0 +1,22 @@
+﻿<td style="text-align: center">
+    <table width="100%" cellpadding="5">
+        <tbody>
+            <tr>
+                <td>
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                @ChildContent
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</td>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = null!;
+}

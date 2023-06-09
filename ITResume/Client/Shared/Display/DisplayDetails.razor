@@ -1,0 +1,27 @@
+﻿@typeparam TModel
+
+@if (Model is null)
+{
+    <Spinner />
+}
+else
+{
+    <center>
+        <NavLink class="btn btn-outline-warning" href="@HrefToEdit">Edit</NavLink>
+        <br /><br />
+        <table class="table table-hover" style="width: 50%;">
+            @ChildContent
+        </table>
+    </center>
+}
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = null!;
+
+    [Parameter]
+    public TModel? Model { get; set; }
+
+    [Parameter]
+    public string HrefToEdit { get; set; } = null!;
+}

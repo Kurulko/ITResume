@@ -1,0 +1,38 @@
+﻿@page "/register"
+
+<AccountPage AccountMode="AccountMode.Register" AccountModel="model" DoAction="Register" >
+    <div class="form-group">
+        <SfTextBox @bind-Value="model.Name" Placeholder="Name" />
+        <ValidationMessage For="@(() => model.Name)" />
+    </div>
+    <br />
+    <div class="form-group">
+        <SfTextBox @bind-Value="model.Email" Placeholder="Email" Type="InputType.Email" />
+        <ValidationMessage For="@(() => model.Email)" />
+    </div>
+    <br />
+    <div class="form-group">
+        <SfTextBox @bind-Value="model.Password" Placeholder="Password" Type="InputType.Password" />
+        <ValidationMessage For="@(() => model.Password)" />
+    </div>
+    <br />
+    <div class="form-group">
+        <SfTextBox @bind-Value="model.PasswordConfirm" Placeholder="PasswordConfirm" Type="InputType.Password" />
+        <ValidationMessage For="@(() => model.PasswordConfirm)" />
+    </div>
+    <br />
+    <div class="form-group">
+        <SfCheckBox @bind-Checked="model.RememberMe" />
+    </div>
+    <br />
+</AccountPage>
+
+@code {
+    RegisterModel model = new();
+
+    [Inject]
+    public CustomStateProvider Auth { get; set; } = null!;
+
+    async Task Register()
+        => await Auth.Register(model);
+}

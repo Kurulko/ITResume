@@ -1,0 +1,18 @@
+﻿@page "/programming-languages"
+@inherits _AdminLayout
+
+<CascadingValue Value="50" Name="PageSize">
+    <SimpleEditITResumeDbModels Service="ProgrammingLanguageService" TModel="ProgrammingLanguage">
+        <GridColumns>
+
+            <GridColumn Field=@nameof(ProgrammingLanguage.Id)  AllowAdding="false" />
+            <GridColumn Field=@nameof(ProgrammingLanguage.Name)
+                        FilterSettings="@(new FilterSettings() { Operator = Operator.Contains })" />
+        </GridColumns>
+    </SimpleEditITResumeDbModels>
+</CascadingValue>
+
+@code {
+    [Inject]
+    public IProgrammingLanguageService ProgrammingLanguageService { get; set; } = null!;
+}

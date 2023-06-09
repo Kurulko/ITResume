@@ -1,0 +1,11 @@
+﻿@typeparam TModel 
+@inherits EditITResumeDbModels<TModel>
+
+<ComplexEditDbModels IdFromModel="@((TModel model) => model.Id)" Service="Service"
+        ChildContent="ChildContent" GetModels="@(() => GetModels(UserService))" HeaderTemplate="HeaderTemplate" RowDetails="RowDetails"/>
+
+
+@code{
+    [Parameter]
+    public RenderFragment<object>? HeaderTemplate { get; set; }
+}

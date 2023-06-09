@@ -1,0 +1,20 @@
+﻿@attribute [Authorize]
+
+@code{
+    protected bool isAdmin; 
+    protected User? user;
+
+    [Inject]
+    public IUserService UserService { get; set; } = null!;
+
+    [CascadingParameter]
+    Task<AuthenticationState> AuthStateTask { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var claims = (await AuthStateTask).User;
+        if (claims.Identity!.IsAuthenticated)
+            user = (await UserService.GetModelByIdAsync(claims.GetUserId()))!;
+        isAdmin = (await UserService.GetRolesAsync(user!.UsedUserId ?? user!.Id)).Contains(Roles.Admin);
+    }
+}

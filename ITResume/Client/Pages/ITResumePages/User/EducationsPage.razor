@@ -1,0 +1,41 @@
+﻿@page "/educations"
+@inherits _UserLayout
+
+<CascadingValue Value="5" Name="PageSize">
+    <ComplexEditITResumeDbModels Service="EducationService" TModel="Education" GetModels="@(us => us.GetUserEducationsAsync())">
+        <GridColumns>
+            <GridColumn Field=@nameof(Education.Id) AllowAdding="false" />
+            <GridColumn Field=@nameof(Education.University) />
+            <GridColumn Field=@nameof(Education.Faculty) />
+            <GridColumn Field=@nameof(Education.Specialty) />
+            <GridColumn Field=@nameof(Education.TypeOfEducation)>
+                <EditTemplate>
+                    <SfDropDownList ID="TypeOfEducation" TItem="string" TValue="TypeOfEducation"
+                                    @bind-Value="@((context as Education)!.TypeOfEducation)"
+                                    DataSource="@typeOfEducationEnumValues" />
+                </EditTemplate>
+            </GridColumn>
+            <GridColumn Field=@nameof(Education.DegreeOfEducation)>
+                <EditTemplate>
+                    <SfDropDownList ID="DegreeOfEducation" TItem="string" TValue="DegreeOfEducation"
+                                    @bind-Value="@((context as Education)!.DegreeOfEducation)"
+                                    DataSource="@degreeOfEducationEnumValues" />
+                </EditTemplate>
+            </GridColumn>
+            <GridColumn Field=@nameof(Education.StartEducation) />
+            <GridColumn Field=@nameof(Education.FinishEducation) />
+        </GridColumns>
+    </ComplexEditITResumeDbModels>
+</CascadingValue>
+
+
+@code {
+    string[] typeOfEducationEnumValues = Enum.GetNames<TypeOfEducation>();
+    string[] degreeOfEducationEnumValues = Enum.GetNames<DegreeOfEducation>();
+
+    [Inject]
+    public IEducationService EducationService { get; set; } = null!;
+
+    [Parameter]
+    public int PageSize { get; set; }
+}

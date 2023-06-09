@@ -1,0 +1,110 @@
+﻿@page "/users"
+@inherits _AdminLayout
+
+@if (usersRoles is not null)
+{
+    <CascadingValue Value="30" Name="PageSize">
+        <ComplexEditDbModels Service="UserService" TModel="User" TKey="string" Context="user">
+            <ChildContent>
+                <GridEvents CommandClicked="OnCommandClicked" TValue="User" />
+                <GridColumns>
+                    <GridColumn Field=@nameof(User.Id) IsPrimaryKey="true" AllowAdding="false" />
+                    <GridColumn Field=@nameof(User.UserName) />
+                    <GridColumn Field=@nameof(User.FirstName) />
+                    <GridColumn Field=@nameof(User.LastName) />
+                    <GridColumn Field=@nameof(User.FatherName) />
+                    <GridColumn Field=@nameof(User.Email) />
+                    <GridColumn Field=@nameof(User.Birthday) />
+                    <GridColumn Field=@nameof(User.Registered) />
+                    <GridColumn HeaderText="Roles" AllowAdding=false>
+                        <Template>
+                            @string.Join(",", usersRoles[((User)context)!.Id])
+                        </Template>
+                        <EditTemplate>
+                            @{
+                                User user = (context as User)!;
+
+                                async Task HandleRoleSelection(IEnumerable<string> selectedValues)
+                                {
+                                    Console.WriteLine($"NULL?:{selectedValues is null}");
+
+                                    if (selectedValues is not null)
+                                    {
+                                        var roles = selectedValues;
+                                        Console.WriteLine(string.Join(",", roles));
+
+                                        foreach (var newRole in roles.Except(usersRoles[user.Id]))
+                                            await UserService.AddRoleToUserAsync(new(user.Id, newRole));
+
+                                        foreach (var oldRole in usersRoles[user.Id].Except(roles))
+                                            await UserService.AddRoleToUserAsync(new(user.Id, oldRole));
+
+
+                                        StateHasChanged();
+                                    }
+                                }
+                            }
+                            <span>Roles</span>
+                            <SfMultiSelect TValue="IEnumerable<string>" TItem="string" Placeholder="Select a role" DataSource="@allRoles"
+                                       Mode="VisualMode.CheckBox" Value="usersRoles[user.Id]" ValueChanged="HandleRoleSelection" />
+                        </EditTemplate>
+
+                    </GridColumn>
+                    <GridColumn>
+                        <GridCommandColumns>
+                            <GridCommandColumn ButtonOption="@(new CommandButtonOptions() {
+                            Content = "Impersonate", CssClass = "e-outline" })" />
+                        </GridCommandColumns>
+                    </GridColumn>
+                </GridColumns>
+            </ChildContent>
+            <HeaderTemplate>
+                @GetDialogHeader((user as User)!)
+            </HeaderTemplate>
+        </ComplexEditDbModels>
+    </CascadingValue>
+}
+
+@code {
+    [Inject]
+    public IUserService UserService { get; set; } = null!;
+
+    [Inject]
+    public IRoleService RoleService { get; set; } = null!;
+
+    [Inject]
+    public NavigationManager NavManager { get; set; } = null!;
+
+    public async Task OnCommandClicked(CommandClickEventArgs<User> args)
+    {
+        if (args.CommandColumn.ButtonOption.Content == "Impersonate")
+        {
+            string userId = (await UserService.GetUserByClaimsAsync(default!))!.Id;
+            string usedUserId = args.RowData.Id;
+            await UserService.ChangeUsedUserIdAsync(userId, usedUserId);
+
+            NavManager.NavigateTo(string.Empty);
+        }
+    }
+
+    string GetDialogHeader(User user)
+        => string.IsNullOrEmpty(user.Id) ? "Add New User" : $"Edit {user.UserName} Details";
+
+    IEnumerable<string>? allRoles;
+    Dictionary<string, IEnumerable<string>>? usersRoles;
+    protected override async Task OnInitializedAsync()
+    {
+        allRoles = (await RoleService.GetAllModelsAsync()).Select(r => r.Name);
+        var urs = (await UserService.GetAllModelsAsync())
+            .Select(async u => new KeyValuePair<string, IEnumerable<string>>(u.Id, await UserService.GetRolesAsync(u.Id)));
+
+        List<KeyValuePair<string, IEnumerable<string>>> ursList = new();
+        foreach (var ur in urs)
+        {
+            KeyValuePair<string, IEnumerable<string>> urItem = await ur;
+            ursList.Add(urItem);
+        }
+
+        usersRoles = new Dictionary<string, IEnumerable<string>>(ursList);
+    }
+}

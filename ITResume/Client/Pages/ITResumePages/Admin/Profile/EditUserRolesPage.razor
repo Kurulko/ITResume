@@ -1,0 +1,79 @@
+﻿@page "/users/{UserId}/edit-roles"
+@inherits _AdminLayout
+
+@if (havingRoles is null)
+{
+    <Spinner />
+}
+else
+{
+    <div class="row">
+        <div class="col-md-9">
+            <div class="row">
+                <div class="col-md-4">Id:</div>
+                <div class="col-md-8">@UserId</div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">Roles:</div>
+                <div class="col-md-8">@string.Join(",", userRoles!)</div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <SfGrid DataSource="havingRoles" Toolbar="Enums.EditMode.Edit" Width="50%" AllowGrouping="true">
+        <GridEditSettings AllowEditing="true"/>
+        <GridEvents OnActionBegin="ActionBeginHandler" TValue="HavingRole" />
+        <GridColumns>
+            <GridColumn Field="@nameof(HavingRole.Role)" AllowEditing="false" AllowGrouping="false"/>
+            <GridColumn Field="@nameof(HavingRole.IsInRole)"/>
+        </GridColumns>
+    </SfGrid>
+}
+
+@code {
+    [Inject]
+    public NavigationManager NavManager { get; set; } = null!;
+
+    [Inject]
+    public IRoleService RoleService { get; set; } = null!;
+
+    [Inject]
+    public IUserService UserService { get; set; } = null!;
+
+    [Parameter]
+    public string UserId { get; set; } = null!;
+
+    IEnumerable<HavingRole>? havingRoles;
+    IEnumerable<string>? userRoles;
+    IEnumerable<string>? allRoles;
+    protected override async Task OnInitializedAsync()
+    {
+        userRoles = await UserService.GetRolesAsync(UserId);
+        allRoles = (await RoleService.GetAllModelsAsync()).Select(r => r.Name);
+        havingRoles = allRoles.Select(r => new HavingRole() { Role = r, IsInRole = IsUserRole(r) });
+    }
+
+
+    public async void ActionBeginHandler(ActionEventArgs<HavingRole> Args)
+    {
+        HavingRole model = Args.Data;
+
+        if (Args.Action == Enums.EditMode.Add.ToString())
+        {
+            string role = model.Role;
+
+            if (IsUserRole(role))
+                await UserService.DeleteRoleFromUserAsync(UserId, role);
+            else
+                await UserService.AddRoleToUserAsync(new(UserId, role));
+        }
+    }
+    bool IsUserRole(string role)
+        => userRoles!.Contains(role);
+
+    public class HavingRole
+    {
+        public string Role { get; set; } = null!;
+        public bool IsInRole { get; set; }
+    }
+}

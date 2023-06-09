@@ -1,0 +1,150 @@
+﻿@page "/"
+@page "/index"
+@using ITResume.Client.Parser;
+@using ITResume.Client.Pages.ITResumePages.User;
+@using ITResume.Client.Pages.ITResumePages.User.ContactPages;
+@using System.Linq.Expressions;
+@inherits _UserLayout
+
+
+<AuthorizeView>
+    <Authorized>
+        <h1>Your resume:</h1>
+        <br />
+        <CascadingValue Value="10" Name="PageSize">
+            <CascadingValue Value="false" Name="IsAllowChanging">
+                <center>
+                    <div class="row" style="width: 50%;">
+
+                        <div class="col-md-5">
+
+                            <DisplayModels Service="@AchievementService" Context="achievement" HeaderText="Achievements">
+                                <RowBody>
+                                    @achievement.Name - @achievement.Link
+                                </RowBody>
+                                <RowDetails>
+                                    @achievement.Description
+                                </RowDetails>
+                            </DisplayModels>
+                            <hr />
+
+                            <DisplayModels Service="@EducationService" Context="education" HeaderText="Educations">
+                                <RowBody>
+                                    <b>@education.University</b>
+                                    <br />
+                                    @education.DegreeOfEducation, "@education.Specialty"
+                                    - @((DateTime.Now - education.StartEducation).TotalDays / 365) course
+                                </RowBody>
+                            </DisplayModels>
+                            <hr />
+
+                            <DisplayModels Service="@ProgrammingLanguageService" Context="programming" HeaderText="Programming Languages">
+                                <RowBody>
+                                    @programming.Name
+                                </RowBody>
+                            </DisplayModels>
+                            <hr />
+
+                            <DisplayModels Service="@TechnologyService" Context="technology" HeaderText="Technologies">
+                                <RowBody>
+                                    @technology.Name
+                                </RowBody>
+                            </DisplayModels>
+                            <hr />
+
+                            <DisplayModels Service="@ForeignLanguageService" Context="foreign" HeaderText="Languages">
+                                <RowBody>
+                                    @foreign.HumanLanguage!.Name - @foreign.LanguageLevel
+                                </RowBody>
+                            </DisplayModels>
+                            <hr />
+
+                            <ContactPage />
+                        </div>
+
+                        <div class="col-md-7">
+
+                            <DisplayModels Service="@EmployeeService" Context="experience" HeaderText="Experience">
+                                <RowBody>
+                                    <b>
+                                        @experience.Post <br />
+                                        @experience.Company!.Name <br />
+                                        @if (experience.Technologies is not null)
+                                        {
+                                            <text>Technologies:</text>
+                                            @string.Join(',', experience.Technologies!.Select(t => t.Name))
+                                            <br />
+                                        }
+                                        @if (experience.ProgrammingLanguages is not null)
+                                        {
+                                            <text>Programming languages:</text>
+                                            @string.Join(',', experience.ProgrammingLanguages!.Select(t => t.Name))
+                                            < br />
+                                        }
+                                        @experience.StartWorking.ToString("MMMM yyyy") - @(experience.FinishWorking?.ToString("MMMM yyyy") ?? "now")
+                                    </b>
+                                </RowBody>
+                                <RowDetails>
+                                    @experience.Description
+                                </RowDetails>
+                            </DisplayModels>
+                            <hr />
+
+                            <DisplayModels Service="@IProjectService" Context="project" HeaderText="Projects">
+                                <RowBody>
+                                    <b>@project.Name</b><br />
+                                    (@project.Link)<br />
+                                    @if (project.Technologies is not null)
+                                    {
+                                        <text>Technologies:</text>
+                                        @string.Join(',', project.Technologies!.Select(t => t.Name))
+                                        <br />
+                                    }
+                                    @if (project.ProgrammingLanguages is not null)
+                                    {
+                                        <text>Programming languages:</text>
+                                        @string.Join(',', project.ProgrammingLanguages!.Select(t => t.Name))
+                                        <br />
+                                    }
+                                    Work example: @project.WorkExample<br />
+                                </RowBody>
+                                <RowDetails>
+                                    @project.Description
+                                </RowDetails>
+                            </DisplayModels>
+                        </div>
+                    </div>
+                </center>
+            </CascadingValue>
+        </CascadingValue>
+    </Authorized>
+    <Authorizing>
+        <Spinner />
+    </Authorizing>
+</AuthorizeView>
+
+@code {
+    [Inject]
+    public IContactService ContactService { get; set; } = null!;
+
+    [Inject]
+    public IAchievementService AchievementService { get; set; } = null!;
+
+    [Inject]
+    public IEducationService EducationService { get; set; } = null!;
+
+    [Inject]
+    public ITechnologyService TechnologyService { get; set; } = null!;
+
+    [Inject]
+    public IEmployeeService EmployeeService { get; set; } = null!;
+
+    [Inject]
+    public IProjectService IProjectService { get; set; } = null!;
+
+    [Inject]
+    public IForeignLanguageService ForeignLanguageService { get; set; } = null!;
+
+    [Inject]
+    public IProgrammingLanguageService ProgrammingLanguageService { get; set; } = null!;
+}

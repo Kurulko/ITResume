@@ -1,0 +1,32 @@
+﻿﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">ToDoList</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        @foreach (var link in Links)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="@link.href">
+                    <span class="@link.cssClass" aria-hidden="true"></span> @link.name
+                </NavLink>
+            </div>
+        }
+    </nav>
+</div>
+
+@code {
+    [Parameter]
+    public IEnumerable<(string cssClass, string href, string name)> Links { get; set; } = null!;
+
+    string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    bool collapseNavMenu = true;
+    void ToggleNavMenu()
+        => collapseNavMenu = !collapseNavMenu;
+}

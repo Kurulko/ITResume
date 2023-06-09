@@ -1,0 +1,32 @@
+﻿@inherits LayoutComponentBase
+
+<BaseLayout Links="@links">@Body</BaseLayout>
+
+@code {
+    [CascadingParameter]
+    Task<AuthenticationState> authStateTask { get; set; } = null!;
+
+    IEnumerable<(string cssClass, string href, string name)> links = Enumerable.Empty<(string, string, string)>();
+
+    IEnumerable<(string cssClass, string href, string name)> userLinks = new List<(string, string, string)>() {
+                ("oi oi-home", "index", "Home"),
+                ("oi oi-list-rich", "achievements", "Achievements"),
+                ("oi oi-list-rich", "educations", "Educations"),
+                ("oi oi-list-rich", "experience", "Experience"),
+                ("oi oi-list-rich", "projects", "Projects"),
+                ("oi oi-list-rich", "contact", "Contact"),
+            };
+    IEnumerable<(string cssClass, string href, string name)> adminLinks = new List<(string, string, string)>() {
+                ("oi oi-list-rich", "users", "Users"),
+                ("oi oi-list-rich", "roles", "Roles"),
+                ("oi oi-list-rich", "countries", "Countries"),
+                ("oi oi-list-rich", "human-languages", "Human Languages"),
+                ("oi oi-list-rich", "programming-languages", "Program Languages"),
+            };
+
+    protected override async Task OnParametersSetAsync()
+    {
+        bool isAdmin = (await authStateTask).User.IsInRole(Roles.Admin);
+        links = isAdmin ? userLinks.Union(adminLinks) : userLinks;
+    }
+}

@@ -1,0 +1,105 @@
+﻿@page "/user/details"
+@page "/me"
+@inherits _UserLayout
+
+<h3>User</h3>
+<hr />
+<h3>Details</h3>
+<br />
+<DisplayDetails Model="user" HrefToEdit="">
+    <tbody>
+        <tr>
+            <th>
+                <DisplayName For="(() => user!.Id)" />
+            </th>
+            <td>
+                @user!.Id
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <DisplayName For="(() => user!.UserName)" />
+            </th>
+            <td>
+                @user!.UserName
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <DisplayName For="(() => user!.Email)" />
+            </th>
+            <td>
+                @user!.Email
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <DisplayName For="(() => user!.FirstName)" />
+            </th>
+            <td>
+                @user!.FirstName
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <DisplayName For="(() => user!.LastName)" />
+            </th>
+            <td>
+                @user!.LastName
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <DisplayName For="(() => user!.FatherName)" />
+            </th>
+            <td>
+                @user!.FatherName
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <DisplayName For="(() => user!.Birthday)" />
+            </th>
+            <td>
+                @user!.Birthday
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <DisplayName For="(() => user!.Registered)" />
+            </th>
+            <td>
+                @user!.Registered
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <DisplayName For="(() => user!.UserDetails!.IsPublicProfile)" />
+            </th>
+            <td>
+                @user!.UserDetails!.IsPublicProfile
+            </td>
+        </tr>
+    </tbody>
+</DisplayDetails>
+<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+        <NavLink href="user/edit" class="btn btn-warning">Edit Profile</NavLink><br /><br />
+        <NavLink href="user/edit-password" class="btn btn-warning">Edit Password</NavLink><br /><br />
+        <NavLink href="users/88820475-6ee3-4547-8400-e6a8d8bf908d/edit-roles" class="btn btn-warning">Edit Roles</NavLink>
+        @*<NavLink href="users/8e92cd4d-b578-4664-a48f-3422de150e84/edit-roles" class="btn btn-warning">Edit Roles</NavLink>*@
+        <br />
+        <br />
+    </div>
+    <div class="col-md-4"></div>
+</div>
+
+@code {
+    [Inject]
+    public IUserService UserService { get; set; } = null!;
+
+    User? user;
+    protected override async Task OnParametersSetAsync()
+        => user = await UserService.GetUserByClaimsAsync(default!);
+}

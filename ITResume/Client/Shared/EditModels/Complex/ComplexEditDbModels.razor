@@ -1,0 +1,43 @@
+﻿@typeparam TModel
+@typeparam TKey
+@inherits EditDbModels<TModel, TKey>
+
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Navigations
+
+@if (models is null)
+{
+    <Spinner />
+}
+else
+{
+    <ShowError Error="@error">
+        <SfGrid @ref="modelGrid" DataSource="models" Toolbar="@GetToolbar()" @bind-AllowPaging="isAllowPaging"
+            @bind-AllowGrouping="isAllowOperationsWithModels" @bind-AllowSorting="isAllowOperationsWithModels" ClipMode="ClipMode.EllipsisWithTooltip">
+            @if (isDetails)
+            {
+                <GridTemplates>
+                    <DetailTemplate>
+                        <DetailTable>
+                            @RowDetails!.Invoke((context as TModel)!)
+                        </DetailTable>
+                    </DetailTemplate>
+                </GridTemplates>
+            }
+            <GridSortSettings AllowUnsort="false" />
+            <GridEditSettings Mode="Syncfusion.Blazor.Grids.EditMode.Dialog" AllowAdding="IsAllowChanging"
+                          AllowEditing="IsAllowChanging" AllowDeleting="IsAllowChanging" HeaderTemplate="HeaderTemplate!" />
+            <GridEvents OnActionBegin="ActionBeginHandler" TValue="TModel" />
+            <GridPageSettings PageSize="PageSize" />
+            @ChildContent
+        </SfGrid>
+    </ShowError>
+}
+
+@code {
+    protected override IEnumerable<string> GetToolbar()
+        => (IsAllowChanging ? base.GetToolbar() : Enumerable.Empty<string>()).Union(new List<string>() { "Search" });
+
+    [Parameter]
+    public RenderFragment<object>? HeaderTemplate { get; set; }
+}

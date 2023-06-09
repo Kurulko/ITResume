@@ -1,0 +1,24 @@
+﻿<SimpleForm Model="@AccountModel" DoAction="Action" ChildContent="@ChildContent" Mode="@AccountMode.ToString()" />
+
+@code {
+    [Inject]
+    public NavigationManager NavManager { get; set; } = null!;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = null!;
+
+    [Parameter]
+    public AccountMode AccountMode { get; set; }
+
+    [Parameter]
+    public AccountModel AccountModel { get; set; } = null!;
+
+    [Parameter]
+    public Func<Task> DoAction { get; set; } = null!;
+
+    async Task Action()
+    {
+        await DoAction();
+        NavManager.NavigateTo(string.Empty);
+    }
+}

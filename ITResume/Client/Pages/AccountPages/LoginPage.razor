@@ -1,0 +1,29 @@
+﻿@page "/login"
+
+<AccountPage AccountMode="AccountMode.Login" AccountModel="model" DoAction="Login">
+    <div class="form-group">
+        <SfTextBox @bind-Value="model.Name" Placeholder="Name" />
+        <ValidationMessage For="@(() => model.Name)" />
+    </div>
+    <br />
+    <div class="form-group">
+        <SfTextBox @bind-Value="model.Password" Placeholder="Password" Type="InputType.Password" />
+        <ValidationMessage For="@(() => model.Password)" />
+    </div>
+    <br />
+    <div class="form-group">
+        <SfCheckBox @bind-Checked="model.RememberMe" />
+    </div>
+    <br />
+</AccountPage>
+
+
+@code {
+    LoginModel model = new();
+
+    [Inject]
+    public CustomStateProvider Auth { get; set; } = null!;
+
+    async Task Login()
+        => await Auth.Login(model);
+}

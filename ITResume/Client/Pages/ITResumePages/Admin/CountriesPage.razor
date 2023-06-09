@@ -1,0 +1,17 @@
+﻿@page "/countries"
+@inherits _AdminLayout
+
+<CascadingValue Value="50" Name="PageSize">
+    <SimpleEditITResumeDbModels Service="CountryService" TModel="Country">
+        <GridColumns>
+            <GridColumn Field=@nameof(Country.Id) AllowAdding="false" />
+            <GridColumn Field=@nameof(Country.Name)
+                        FilterSettings="@(new FilterSettings() { Operator = Operator.Contains })" />
+        </GridColumns>
+    </SimpleEditITResumeDbModels>
+</CascadingValue>
+
+@code {
+    [Inject]
+    public ICountryService CountryService { get; set; } = null!;
+}

@@ -1,0 +1,81 @@
+﻿@page "/contact"
+@inherits _UserLayout
+
+<DisplayDetails Model="contact" HrefToEdit="contact/edit">
+    <tbody>
+        <tr>
+            <th>
+                <DisplayName For="(() => contact!.Email)" />
+            </th>
+            <td>
+                @contact!.Email
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <DisplayName For="(() => contact.MobilePhone)" />
+            </th>
+            <td>
+                @contact.MobilePhone
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <DisplayName For="(() => contact.Github)" />
+            </th>
+            <td>
+                @contact.Github
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <DisplayName For="(() => contact.LinkedId)" />
+            </th>
+            <td>
+                @contact.LinkedId
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <DisplayName For="(() => contact.Habr)" />
+            </th>
+            <td>
+                @contact.Habr
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <DisplayName For="(() => contact.Stackoverflow)" />
+            </th>
+            <td>
+                @contact.Stackoverflow
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <DisplayName For="(() => contact.Telegram)" />
+            </th>
+            <td>
+                @contact.Telegram
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <label>Country</label>
+            </th>
+            <td>
+                @contact.Country?.Name
+            </td>
+        </tr>
+    </tbody>
+</DisplayDetails>
+
+@code {
+    Contact? contact;
+
+    [Inject]
+    public IUserService UserService { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+        => contact = await UserService.GetUserContactAsync();
+}

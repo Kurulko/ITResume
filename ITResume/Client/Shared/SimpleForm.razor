@@ -1,0 +1,38 @@
+﻿<center>
+    <div style="width: 50%;">
+        <ShowError Error="@error">
+            <EditForm Model="@Model" OnValidSubmit="Action">
+                <DataAnnotationsValidator />
+                @ChildContent
+                <button class="btn btn-outline-warning">@Mode</button>
+            </EditForm>
+        </ShowError>
+    </div>
+</center>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = null!;
+
+    [Parameter]
+    public string Mode { get; set; } = null!;
+
+    [Parameter]
+    public object? Model { get; set; } = null!;
+
+    [Parameter]
+    public Func<Task> DoAction { get; set; } = null!;
+
+    string? error;
+    async Task Action()
+    {
+        try
+        {
+            await DoAction();
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+}

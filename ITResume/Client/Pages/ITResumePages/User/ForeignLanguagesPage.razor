@@ -1,0 +1,39 @@
+﻿@page "/foreign-languages"
+@inherits _UserLayout
+
+<CascadingValue Value="10" Name="PageSize">
+    <SimpleEditITResumeDbModels Service="ForeignLanguageService" TModel="ForeignLanguage" GetModels="@(us => us.GetUserForeignLanguagesAsync())">
+        <GridColumns>
+            <GridColumn Field=@nameof(ForeignLanguage.Id) AllowAdding="false" />
+            <GridColumn Field="HumanLanguage.Name" HeaderText="Name">
+                <EditTemplate>
+                    <SfDropDownList TItem="HumanLanguage" TValue="long" DataSource="@humanLanguages"
+                                    @bind-Value="@((context as ForeignLanguage)!.HumanLanguageId)">
+                        <DropDownListFieldSettings Text="Name" Value="Id" />
+                    </SfDropDownList>
+                </EditTemplate>
+            </GridColumn>
+            <GridColumn Field=@nameof(ForeignLanguage.LanguageLevel) >
+                <EditTemplate>
+                    <SfDropDownList ID="LanguageLevel" TItem="string" TValue="LanguageLevel"
+                                    @bind-Value="@((context as ForeignLanguage)!.LanguageLevel)"
+                                    DataSource="@languageLevelEnumValues" />
+                </EditTemplate>
+            </GridColumn>
+        </GridColumns>
+    </SimpleEditITResumeDbModels>
+</CascadingValue>
+
+@code {
+    string[] languageLevelEnumValues = Enum.GetNames<LanguageLevel>();
+
+    [Inject]
+    public IForeignLanguageService ForeignLanguageService { get; set; } = null!;
+
+    [Inject]
+    public IHumanLanguageService HumanLanguageService { get; set; } = null!;
+
+    IEnumerable<HumanLanguage>? humanLanguages;
+    protected override async Task OnInitializedAsync()
+        => humanLanguages = await HumanLanguageService.GetAllModelsAsync();
+}

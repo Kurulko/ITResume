@@ -1,0 +1,68 @@
+﻿@page "/roles"
+@inherits _AdminLayout
+
+<CascadingValue Value="30" Name="PageSize">
+    <SimpleEditDbModels Service="RoleService" TModel="Role" TKey="string" Context="role">
+        <ChildContent>
+            <GridColumns>
+                <GridColumn Field=@nameof(Role.Id) IsPrimaryKey="true" AllowAdding="false" />
+                <GridColumn Field=@nameof(Role.Name)
+                            FilterSettings="@(new FilterSettings() { Operator = Operator.Contains })" />
+            </GridColumns>
+        </ChildContent>
+        <RowDetails>
+            <td colspan="2">
+                Users:
+                <table class="table  table-hover">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>User name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (User user in roleUsers[role.Name])
+                        {
+                            <tr>
+                                <td>@user.Id</td>
+                                <td>@user.UserName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </td>
+        </RowDetails>
+    </SimpleEditDbModels>
+</CascadingValue>
+
+@code {
+    [Inject]
+    public IRoleService RoleService { get; set; } = null!;
+
+    [Inject]
+    public IUserService UserService { get; set; } = null!;
+
+    Dictionary<string, IEnumerable<User>> roleUsers = new();
+    protected override async Task OnInitializedAsync()
+    {
+        var roles = await RoleService.GetAllModelsAsync();
+        foreach (Role role in roles)
+            roleUsers.Add(role.Name, await GetUsersByRoleAsync(role.Name));
+    }
+
+    async Task<IEnumerable<User>> GetUsersByRoleAsync(string role)
+    {
+        IList<User> usersByRole = new List<User>();
+
+        var allUser = await UserService.GetAllModelsAsync();
+
+        foreach (User user in allUser)
+        {
+            var userRoles = await UserService.GetRolesAsync(user.Id);
+            if (userRoles.Contains(role))
+                usersByRole.Add(user);
+        }
+
+        return usersByRole;
+    }
+}

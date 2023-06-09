@@ -1,0 +1,60 @@
+﻿@using ITResume.Client.Extensions;
+
+<AuthorizeView>
+    <Authorized>
+        @if (user is null)
+        {
+            <SfSpinner Visible="true" Type="@SpinnerType.Bootstrap" Size="50" />
+        }
+        else
+        {
+            <NavLink class="btn btn-link" href="/user/details"> Hello, @user.UserName!</NavLink>
+            <button class="btn btn-link" @onclick="LogoutClick">Logout</button>
+            @if (!string.IsNullOrEmpty(user?.UsedUserId))
+            {
+                <button class="btn btn-link" @onclick="FinishImpersonating">Finish Impersonating</button>
+            }
+        }
+    </Authorized>
+    <NotAuthorized>
+        <NavLink class="nav-link btn btn-link" href="/register">Register</NavLink>
+        <NavLink class="nav-link btn btn-link" href="/login">Login</NavLink>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [Inject]
+    public NavigationManager NavManager { get; set; } = null!;
+
+    [Inject]
+    public CustomStateProvider Auth { get; set; } = null!;
+
+    [Inject]
+    public IUserService IUser { get; set; } = null!;
+
+    [CascadingParameter]
+    Task<AuthenticationState> AuthStateTask { get; set; } = null!;
+
+
+    async Task LogoutClick()
+    {
+        await Auth.Logout();
+        NavManager.NavigateTo("/login");
+    }
+
+    async Task FinishImpersonating()
+    {
+        await IUser.DropUsedUserIdAsync(user.Id);
+        user.UsedUserId = null;
+        NavManager.NavigateTo(string.Empty);
+    }
+
+    protected internal User user = null!;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var claims = (await AuthStateTask).User;
+        if (claims.Identity!.IsAuthenticated)
+            user = (await IUser.GetModelByIdAsync(claims.GetUserId()))!;
+    }
+}

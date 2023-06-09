@@ -1,0 +1,107 @@
+﻿@using System.Linq.Expressions;
+@typeparam TModel
+@typeparam TKey
+
+@if (models is null)
+{
+    <Spinner />
+}
+else
+{
+    <SfGrid DataSource="@models" AllowPaging="isAllowPading">
+        <GridPageSettings PageSize="PageSize" />
+        <GridTemplates>
+            <RowTemplate>
+                <td style="text-align: center">
+                    <table class="table" width="100%">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <table class="table">
+                                        <tbody>
+                                            @{
+                                                TModel model = (context as TModel)!;
+                                            }
+                                            <tr>
+                                                @if (isDetails)
+                                                {
+                                                    <td>
+                                                        <span @onclick="() => ToggleDetail(model)">
+                                                            @if (expandedRows.Contains(context))
+                                                            {
+                                                                <span>&#9660;</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>
+                                                                    &#9654;
+                                                                </span>
+                                                            }
+                                                        </span>
+                                                    </td>
+                                                }
+                                                <td>
+                                                    @RowBody(model)
+                                                </td>
+
+                                            </tr>
+                                            @if (isDetails && expandedRows.Contains(model))
+                                            {
+                                                <tr>
+                                                    <td colspan="2">
+                                                        @RowDetails!.Invoke(model)
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </RowTemplate>
+        </GridTemplates>
+        <GridColumns>
+            <GridColumn HeaderText="@HeaderText" TextAlign="TextAlign.Center" />
+        </GridColumns>
+    </SfGrid>
+}
+
+@code {
+    IList<TModel> expandedRows = new List<TModel>();
+
+    void ToggleDetail(TModel model)
+    {
+        if (isDetails)
+        {
+            if (expandedRows.Contains(model))
+                expandedRows.Remove(model);
+            else
+                expandedRows.Add(model);
+        }
+    }
+
+    IEnumerable<TModel>? models;
+
+    [Parameter]
+    public IDbModelService<TModel, TKey> Service { get; set; } = null!;
+
+    [Parameter]
+    public string HeaderText { get; set; } = null!;
+
+    [Parameter]
+    public RenderFragment<TModel> RowBody { get; set; } = null!;
+
+    bool isDetails => RowDetails is not null;
+    bool isAllowPading => models is not null && models.Count() > PageSize;
+
+    [Parameter]
+    public RenderFragment<TModel>? RowDetails { get; set; }
+
+    [CascadingParameter(Name = "PageSize")]
+    public int PageSize { get; set; }
+
+    protected override async Task OnInitializedAsync()
+        => models = await Service.GetAllModelsAsync();
+}

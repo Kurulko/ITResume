@@ -1,0 +1,25 @@
+﻿@page "/experience"
+@inherits _UserLayout
+
+<CascadingValue Value="10" Name="PageSize">
+    <ComplexEditITResumeDbModels Service="EmployeeService" TModel="Employee" Context="employee" GetModels="@(us => us.GetUserEmployeesAsync())">
+        <ChildContent>
+            <GridColumns>
+                <GridColumn Field=@nameof(Employee.Id) AllowAdding="false" />
+                <GridColumn Field=@nameof(Employee.StartWorking) />
+                <GridColumn Field=@nameof(Employee.FinishWorking) />
+                <GridColumn Field=@nameof(Employee.Salary) />
+            </GridColumns>
+        </ChildContent>
+        <RowDetails>
+            <td colspan="4">@employee.Description</td>
+        </RowDetails>
+    </ComplexEditITResumeDbModels>
+</CascadingValue>
+
+
+@code {
+
+    [Inject]
+    public IEmployeeService EmployeeService { get; set; } = null!;
+}

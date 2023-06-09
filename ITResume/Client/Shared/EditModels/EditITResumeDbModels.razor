@@ -1,0 +1,18 @@
+﻿@typeparam TModel
+
+@code {
+    [Parameter]
+    public IITResumeDbModelService<TModel> Service { get; set; } = null!;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = null!;
+
+    [Parameter]
+    public RenderFragment<TModel>? RowDetails { get; set; }
+
+    [Parameter]
+    public Func<IUserService, Task<IEnumerable<TModel>>> GetModels { get; set; } = null!;
+
+    [Inject]
+    public IUserService UserService { get; set; } = null!;
+}

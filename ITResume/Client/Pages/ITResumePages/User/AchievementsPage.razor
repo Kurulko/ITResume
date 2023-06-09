@@ -1,0 +1,24 @@
+﻿@page "/achievements"
+@inherits _UserLayout
+
+<CascadingValue Value="10" Name="PageSize">
+    <ComplexEditITResumeDbModels Service="AchievementService" TModel="Achievement" Context="achievement" GetModels="@(us => us.GetUserAchievementsAsync())">
+        <ChildContent>
+            <GridColumns>
+                <GridColumn Field=@nameof(Achievement.Id) AllowAdding="false" />
+                <GridColumn Field=@nameof(Achievement.Name) />
+                <GridColumn Field=@nameof(Achievement.Link) />
+                <GridColumn Field=@nameof(Achievement.When) />
+            </GridColumns>
+        </ChildContent>
+        <RowDetails>
+            <td colspan="4">@achievement.Description</td>
+        </RowDetails>
+    </ComplexEditITResumeDbModels>
+</CascadingValue>
+
+
+@code {
+    [Inject]
+    public IAchievementService AchievementService { get; set; } = null!;
+}
