@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/ITResume/Client/Settings/SyncfusionSettings.cs
+/ITResume/Server/Settings/GithubSettings.cs
+/ITResume/Server/appsettings.json
