@@ -1,0 +1,7 @@
+﻿@typeparam TModel
+@inherits EditITResumeDbModels<TModel>
+
+@code {
+    [Parameter]
+    public Func<IUserService, Task<IEnumerable<TModel>>> GetModels { get; set; } = null!;
+}

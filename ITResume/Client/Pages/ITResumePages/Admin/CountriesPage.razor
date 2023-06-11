@@ -3,11 +3,10 @@
 
 <CascadingValue Value="50" Name="PageSize">
     <SimpleEditITResumeDbModels Service="CountryService" TModel="Country">
-        <GridColumns>
-            <GridColumn Field=@nameof(Country.Id) AllowAdding="false" />
+        <Columns>
             <GridColumn Field=@nameof(Country.Name)
                         FilterSettings="@(new FilterSettings() { Operator = Operator.Contains })" />
-        </GridColumns>
+        </Columns>
     </SimpleEditITResumeDbModels>
 </CascadingValue>
 

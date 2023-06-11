@@ -1,12 +1,11 @@
 ﻿@using System.Linq.Expressions;
 @typeparam TModel
-@typeparam TKey
 
 @if (models is null)
 {
     <Spinner />
 }
-else
+else if (models.Any())
 {
     <SfGrid DataSource="@models" AllowPaging="isAllowPading">
         <GridPageSettings PageSize="PageSize" />
@@ -84,8 +83,11 @@ else
 
     IEnumerable<TModel>? models;
 
+    [Inject]
+    public IUserService UserService { get; set; } = null!;
+
     [Parameter]
-    public IDbModelService<TModel, TKey> Service { get; set; } = null!;
+    public Func<IUserService, Task<IEnumerable<TModel>>> GetModels { get; set; } = null!;
 
     [Parameter]
     public string HeaderText { get; set; } = null!;
@@ -103,5 +105,5 @@ else
     public int PageSize { get; set; }
 
     protected override async Task OnInitializedAsync()
-        => models = await Service.GetAllModelsAsync();
+        => models = await GetModels(UserService);
 }

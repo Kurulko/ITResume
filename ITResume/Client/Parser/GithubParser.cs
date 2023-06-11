@@ -4,10 +4,10 @@ using Project = ITResume.Shared.Models.Database.Project;
 
 namespace ITResume.Client.Parser;
 
-public class GitbubParser : ISiteParser
+public class GithubParser : ISiteParser
 {
     readonly string githubUsername;
-    public GitbubParser(string githubUsername)
+    public GithubParser(string githubUsername)
         => this.githubUsername = githubUsername;
 
     public IEnumerable<Project> Projects { get; set; } = null!;
@@ -21,7 +21,7 @@ public class GitbubParser : ISiteParser
             {
                 Name = r.Name,
                 Description = r.Description,
-                Github = r.GitUrl,
+                Github = r.HtmlUrl,
                 StartDoing = r.CreatedAt.UtcDateTime,
                 FinishDoing = r.PushedAt?.UtcDateTime,
                 ProgrammingLanguages = new List<ProgrammingLanguage>() { new() { Name = r.Language } }

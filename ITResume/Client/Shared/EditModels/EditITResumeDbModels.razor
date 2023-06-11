@@ -1,4 +1,6 @@
-﻿@typeparam TModel
+﻿@using ITResume.Client.Pages.ITResumePages.User;
+@typeparam TModel
+@inherits _UserLayout
 
 @code {
     [Parameter]
@@ -11,8 +13,5 @@
     public RenderFragment<TModel>? RowDetails { get; set; }
 
     [Parameter]
-    public Func<IUserService, Task<IEnumerable<TModel>>> GetModels { get; set; } = null!;
-
-    [Inject]
-    public IUserService UserService { get; set; } = null!;
+    public RenderFragment Columns { get; set; } = null!;
 }

@@ -86,8 +86,8 @@ using (IServiceScope serviceScope = app.Services.CreateScope())
     var roleManager = serviceProvider.GetRequiredService<RoleManager<Role>>();
     await RolesInitializer.InitializeAsync(roleManager);
 
-    string adminName = config.GetValue<string>("Admin:Name");
-    string adminPassword = config.GetValue<string>("Admin:Password");
+    string adminName = config.GetValue<string>("Admin:Name")!;
+    string adminPassword = config.GetValue<string>("Admin:Password")!;
     var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
     await UsersInitializer.AdminInitializeAsync(userManager, adminName, adminPassword);
 }

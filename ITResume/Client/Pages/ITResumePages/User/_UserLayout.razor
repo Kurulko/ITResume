@@ -13,8 +13,8 @@
     protected override async Task OnInitializedAsync()
     {
         var claims = (await AuthStateTask).User;
+        isAdmin = claims.IsInRole(Roles.Admin);
         if (claims.Identity!.IsAuthenticated)
-            user = (await UserService.GetModelByIdAsync(claims.GetUserId()))!;
-        isAdmin = (await UserService.GetRolesAsync(user!.UsedUserId ?? user!.Id)).Contains(Roles.Admin);
+            user = (await (isAdmin ? UserService.GetUsedUserAsync() : UserService.GetModelByIdAsync(claims.GetUserId())!))!;
     }
 }

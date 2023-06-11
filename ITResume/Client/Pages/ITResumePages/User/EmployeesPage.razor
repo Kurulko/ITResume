@@ -2,24 +2,83 @@
 @inherits _UserLayout
 
 <CascadingValue Value="10" Name="PageSize">
-    <ComplexEditITResumeDbModels Service="EmployeeService" TModel="Employee" Context="employee" GetModels="@(us => us.GetUserEmployeesAsync())">
-        <ChildContent>
-            <GridColumns>
-                <GridColumn Field=@nameof(Employee.Id) AllowAdding="false" />
-                <GridColumn Field=@nameof(Employee.StartWorking) />
-                <GridColumn Field=@nameof(Employee.FinishWorking) />
-                <GridColumn Field=@nameof(Employee.Salary) />
-            </GridColumns>
-        </ChildContent>
+    <ComplexEditUserITResumeDbModels Service="EmployeeService" TModel="Employee" Context="employee" GetModels="@(us => us.GetUserEmployeesAsync())">
+        <Columns>
+            <GridColumn Field=@nameof(Employee.StartWorking) />
+            <GridColumn Field=@nameof(Employee.FinishWorking) />
+            <GridColumn Field=@nameof(Employee.Salary) />
+            <GridColumn Field=@nameof(Employee.CompanyId) HeaderText="Company">
+                <Template>
+                    @(((Employee)context)!.Company?.Name ?? "no name")
+                </Template>
+                <EditTemplate>
+                    <span>Company</span>
+                    <SfDropDownList TItem="Company" TValue="long" DataSource="@allCompanies"
+                                    @bind-Value="@((context as Employee)!.CompanyId)">
+                        <DropDownListFieldSettings Text="Name" Value="Id" />
+                    </SfDropDownList>
+                </EditTemplate>
+            </GridColumn>
+            <GridColumn Field=@nameof(Project.ProgrammingLanguages) HeaderText="Languages">
+                <Template>
+                    @DisplayProgrammingLanguages(context)
+                </Template>
+                <EditTemplate>
+                    @{
+                        Project project = context as Project ?? new();
+                    }
+                    <MultiSelect AllItems="allLanguages" Placeholder="Select a language" Title="Programming Languages" TextFieldStr="@nameof(ProgrammingLanguage.Name)"
+                                 SaveAsync="@(languages => Task.FromResult(project.ProgrammingLanguages = languages))" CurrentValues="project.ProgrammingLanguages" />
+                </EditTemplate>
+            </GridColumn>
+            <GridColumn Field=@nameof(Project.Technologies) HeaderText="Technologies">
+                <Template>
+                    @DisplayTechnologies(context)
+                </Template>
+                <EditTemplate>
+                    @{
+                        Employee employee = context as Employee ?? new();
+                    }
+                    <MultiSelect AllItems="allTechnologies" Placeholder="Select a language" Title="Technologies" TextFieldStr="@nameof(Technology.Name)"
+                                 SaveAsync="@(technologies => Task.FromResult(employee.Technologies = technologies))" CurrentValues="employee.Technologies" />
+                </EditTemplate>
+            </GridColumn>
+        </Columns>
         <RowDetails>
             <td colspan="4">@employee.Description</td>
         </RowDetails>
-    </ComplexEditITResumeDbModels>
+    </ComplexEditUserITResumeDbModels>
 </CascadingValue>
 
 
 @code {
+    IEnumerable<ProgrammingLanguage>? allLanguages;
+    IEnumerable<Technology>? allTechnologies;
+    IEnumerable<Company>? allCompanies;
 
     [Inject]
     public IEmployeeService EmployeeService { get; set; } = null!;
+
+    [Inject]
+    public IProgrammingLanguageService ProgrammingLanguageService { get; set; } = null!;
+
+    [Inject]
+    public ITechnologyService TechnologyService { get; set; } = null!;
+
+    [Inject]
+    public ICompanyService CompanyService { get; set; } = null!;
+
+
+    string DisplayProgrammingLanguages(object context)
+        => string.Join(",", (context as IEnumerable<ProgrammingLanguage>)?.Select(pl => pl.Name) ?? Enumerable.Empty<string>());
+
+    string DisplayTechnologies(object context)
+        => string.Join(",", (context as IEnumerable<Technology>)?.Select(pl => pl.Name) ?? Enumerable.Empty<string>());
+
+    protected override async Task OnInitializedAsync()
+    {
+        allLanguages = await ProgrammingLanguageService.GetAllModelsAsync();
+        allTechnologies = await TechnologyService.GetAllModelsAsync();
+        allCompanies = await CompanyService.GetAllModelsAsync();
+    }
 }

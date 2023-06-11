@@ -7,15 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ITResume.Server.Controllers;
 
-public class RolesController : DbModelsController<Role, string>
+public class RolesController : AdminDbModelsController<Role, string>
 {
     public RolesController(IRoleService service) : base(service) { }
-
-    [Authorize(Roles = Roles.Admin)]
-    public override async Task<IEnumerable<Role>> GetModelsAsync()
-        => await base.GetModelsAsync();
-
-    [Authorize(Roles = Roles.Admin)]
-    public override async Task<Role?> GetModelByIdAsync(string key)
-        => await base.GetModelByIdAsync(key);
 }

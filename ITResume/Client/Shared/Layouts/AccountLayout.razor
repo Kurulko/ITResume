@@ -1,0 +1,10 @@
+﻿@inherits LayoutComponentBase
+
+<BaseLayout Links="@accountLinks">@Body</BaseLayout>
+
+@code{
+    IEnumerable<(string cssClass, string href, string name)> accountLinks = new List<(string, string, string)>() {
+                ("oi oi-person", "login", "Login"),
+                ("oi oi-account-login","register", "Register")
+            };
+}

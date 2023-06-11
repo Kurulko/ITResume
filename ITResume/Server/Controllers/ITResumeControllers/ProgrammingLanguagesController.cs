@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ITResume.Server.Controllers.ITResumeControllers;
 
 [Route("api/programming-languages")]
-public class ProgrammingLanguagesController : ITResumeDbModelsController<ProgrammingLanguage>
+public class ProgrammingLanguagesController : AdminITResumeDbModelsController<ProgrammingLanguage>
 {
     public ProgrammingLanguagesController(IProgrammingLanguageService service) : base(service) { }
 }

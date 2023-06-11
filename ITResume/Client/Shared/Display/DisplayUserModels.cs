@@ -2,7 +2,7 @@
 
 namespace ITResume.Client.Shared.Display;
 
-public partial class DisplayModels<TModel, TKey>
+public partial class DisplayUserModels<TModel>
      where TModel : class, IDbModel 
 {
 

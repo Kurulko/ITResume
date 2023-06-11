@@ -15,7 +15,6 @@ public class Contact : UserITResumeDbModel
     [Phone]
     public string? MobilePhone { get; set; }
 
-    [Url]
     public string? Github { get; set; }
 
     [EmailAddress]

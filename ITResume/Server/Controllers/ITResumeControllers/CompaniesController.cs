@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ITResume.Server.Controllers.ITResumeControllers;
 
-public class CompaniesController : ITResumeDbModelsController<Company>
+public class CompaniesController : AdminITResumeDbModelsController<Company>
 {
     public CompaniesController(ICompanyService service) : base(service) { }
 }

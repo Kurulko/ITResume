@@ -63,14 +63,6 @@ else
     [Inject]
     public NavigationManager NavManager { get; set; } = null!;
 
-    [Inject]
-    public IUserService UserService { get; set; } = null!;
-
-    User? user;
-    protected override async Task OnParametersSetAsync()
-        => user = await UserService.GetUserByClaimsAsync(default!);
-
-
     async Task Action()
     {
         await UserService.UpdateModelAsync(user!);

@@ -1,10 +1,10 @@
 ﻿@typeparam TModel 
-@inherits EditITResumeDbModels<TModel>
+@inherits EditUserITResumeDbModels<TModel>
 
 <ComplexEditDbModels IdFromModel="@((TModel model) => model.Id)" Service="Service"
-        HeaderTemplate="HeaderTemplate" RowDetails="RowDetails">
-     <GridColumns>
-        <GridColumn Field=@nameof(ITResumeDbModel.Id) AllowAdding="false" />
+        GetModels="@(() => GetModels(UserService))" HeaderTemplate="HeaderTemplate" RowDetails="RowDetails">
+    <GridColumns>
+        <GridColumn Field=@nameof(ITResumeDbModel.Id) AllowAdding="false" Visible="isAdmin" />
         @Columns
     </GridColumns>
     @ChildContent

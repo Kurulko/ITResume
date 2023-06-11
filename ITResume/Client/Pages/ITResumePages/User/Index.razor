@@ -18,53 +18,120 @@
 
                         <div class="col-md-5">
 
-                            <DisplayModels Service="@AchievementService" Context="achievement" HeaderText="Achievements">
+                            <DisplayUserModels TModel="Achievement" GetModels="@(us => us.GetUserAchievementsAsync())" Context="achievement" HeaderText="Achievements">
                                 <RowBody>
                                     @achievement.Name - @achievement.Link
                                 </RowBody>
                                 <RowDetails>
                                     @achievement.Description
                                 </RowDetails>
-                            </DisplayModels>
+                            </DisplayUserModels>
                             <hr />
 
-                            <DisplayModels Service="@EducationService" Context="education" HeaderText="Educations">
+                            <DisplayUserModels TModel="Education" GetModels="@(us => us.GetUserEducationsAsync())" Context="education" HeaderText="Educations">
                                 <RowBody>
                                     <b>@education.University</b>
                                     <br />
                                     @education.DegreeOfEducation, "@education.Specialty"
                                     - @((DateTime.Now - education.StartEducation).TotalDays / 365) course
                                 </RowBody>
-                            </DisplayModels>
+                            </DisplayUserModels>
                             <hr />
 
-                            <DisplayModels Service="@ProgrammingLanguageService" Context="programming" HeaderText="Programming Languages">
+                            <DisplayUserModels TModel="ProgrammingLanguage" GetModels="@(us => us.GetUserProgrammingLanguagesAsync())" Context="programming" HeaderText="Programming Languages">
                                 <RowBody>
                                     @programming.Name
                                 </RowBody>
-                            </DisplayModels>
+                            </DisplayUserModels>
                             <hr />
 
-                            <DisplayModels Service="@TechnologyService" Context="technology" HeaderText="Technologies">
+                            <DisplayUserModels TModel="Technology" GetModels="@(us => us.GetUserTechnologiesAsync())" Context="technology" HeaderText="Technologies">
                                 <RowBody>
                                     @technology.Name
                                 </RowBody>
-                            </DisplayModels>
+                            </DisplayUserModels>
                             <hr />
 
-                            <DisplayModels Service="@ForeignLanguageService" Context="foreign" HeaderText="Languages">
+                            <DisplayUserModels TModel="ForeignLanguage" GetModels="@(us => us.GetUserForeignLanguagesAsync())" Context="foreign" HeaderText="Languages">
                                 <RowBody>
                                     @foreign.HumanLanguage!.Name - @foreign.LanguageLevel
                                 </RowBody>
-                            </DisplayModels>
+                            </DisplayUserModels>
                             <hr />
 
-                            <ContactPage />
+                            <DisplayUserModels TModel="Contact" GetModels="@(async us => new List<Contact>(){(await us.GetUserContactAsync())!})" Context="contact" HeaderText="Contact">
+                                <RowBody>
+                                    <tr>
+                                        <th>
+                                            <DisplayName For="(() => contact!.Email)" />
+                                        </th>
+                                        <td>
+                                            @contact!.Email
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            <DisplayName For="(() => contact.MobilePhone)" />
+                                        </th>
+                                        <td>
+                                            @contact.MobilePhone
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            <DisplayName For="(() => contact.Github)" />
+                                        </th>
+                                        <td>
+                                            @contact.Github
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            <DisplayName For="(() => contact.LinkedId)" />
+                                        </th>
+                                        <td>
+                                            @contact.LinkedId
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            <DisplayName For="(() => contact.Habr)" />
+                                        </th>
+                                        <td>
+                                            @contact.Habr
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            <DisplayName For="(() => contact.Stackoverflow)" />
+                                        </th>
+                                        <td>
+                                            @contact.Stackoverflow
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            <DisplayName For="(() => contact.Telegram)" />
+                                        </th>
+                                        <td>
+                                            @contact.Telegram
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            <label>Country</label>
+                                        </th>
+                                        <td>
+                                            @contact.Country?.Name
+                                        </td>
+                                    </tr>
+                                </RowBody>
+                            </DisplayUserModels>
                         </div>
 
                         <div class="col-md-7">
 
-                            <DisplayModels Service="@EmployeeService" Context="experience" HeaderText="Experience">
+                            <DisplayUserModels TModel="Employee" GetModels="@(us => us.GetUserEmployeesAsync())" Context="experience" HeaderText="Experience">
                                 <RowBody>
                                     <b>
                                         @experience.Post <br />
@@ -87,10 +154,10 @@
                                 <RowDetails>
                                     @experience.Description
                                 </RowDetails>
-                            </DisplayModels>
+                            </DisplayUserModels>
                             <hr />
 
-                            <DisplayModels Service="@IProjectService" Context="project" HeaderText="Projects">
+                            <DisplayUserModels TModel="Project" GetModels="@(us => us.GetUserProjectsAsync())" Context="project" HeaderText="Projects">
                                 <RowBody>
                                     <b>@project.Name</b><br />
                                     (@project.Link)<br />
@@ -111,7 +178,7 @@
                                 <RowDetails>
                                     @project.Description
                                 </RowDetails>
-                            </DisplayModels>
+                            </DisplayUserModels>
                         </div>
                     </div>
                 </center>
@@ -123,28 +190,3 @@
     </Authorizing>
 </AuthorizeView>
 
-@code {
-    [Inject]
-    public IContactService ContactService { get; set; } = null!;
-
-    [Inject]
-    public IAchievementService AchievementService { get; set; } = null!;
-
-    [Inject]
-    public IEducationService EducationService { get; set; } = null!;
-
-    [Inject]
-    public ITechnologyService TechnologyService { get; set; } = null!;
-
-    [Inject]
-    public IEmployeeService EmployeeService { get; set; } = null!;
-
-    [Inject]
-    public IProjectService IProjectService { get; set; } = null!;
-
-    [Inject]
-    public IForeignLanguageService ForeignLanguageService { get; set; } = null!;
-
-    [Inject]
-    public IProgrammingLanguageService ProgrammingLanguageService { get; set; } = null!;
-}

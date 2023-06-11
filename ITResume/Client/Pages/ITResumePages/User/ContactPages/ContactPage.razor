@@ -73,9 +73,6 @@
 @code {
     Contact? contact;
 
-    [Inject]
-    public IUserService UserService { get; set; } = null!;
-
     protected override async Task OnInitializedAsync()
         => contact = await UserService.GetUserContactAsync();
 }

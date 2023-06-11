@@ -6,20 +6,34 @@ using ITResume.Shared.Services;
 using ITResume.Shared.Services.ITResumeServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Octokit;
+using User = ITResume.Shared.Models.Database.User;
+using Project = ITResume.Shared.Models.Database.Project;
 
 namespace ITResume.Server.Controllers;
 
-//[Authorize(Roles = Roles.Admin)]
-public class UsersController : DbModelsController<User, string>
+public class UsersController : AdminDbModelsController<User, string>
 {
     public UsersController(IUserService service) : base(service) { }
 
     IUserService userService => (service as IUserService)!;
 
-    [Authorize]
+    [AllowAnonymous]
+    public override async Task<User?> GetModelByIdAsync(string key)
+    {
+        await CheckAccessForUser(key);
+        return await base.GetModelByIdAsync(key);
+    }
+
+    [AllowAnonymous]
     [HttpGet("current")]
     public virtual async Task<User?> GetUserByClaimsAsync()
-        => await userService.GetUserByClaimsAsync(User);
+    {
+        CheckAccess();
+        return await userService.GetUserByClaimsAsync(User);
+    }
+
 
     [HttpGet("name")]
     public virtual async Task<User?> GetUserByNameAsync(string name)
@@ -37,64 +51,99 @@ public class UsersController : DbModelsController<User, string>
     public async Task DropUsedUserIdAsync(UserAndUsedUser args)
         => await ReturnOkIfEverithingIsGood(async () => await userService.DropUsedUserIdAsync(args.UserId));
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("user-contact")]
     public virtual async Task<Contact?> GetUserContactAsync()
-        => await userService.GetUserContactAsync();
+    {
+        CheckAccess();
+        return await userService.GetUserContactAsync();
+    }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("user-achievements")]
     public virtual async Task<IEnumerable<Achievement>> GetUserAchievementsAsync()
-        => await userService.GetUserAchievementsAsync();
+    {
+        CheckAccess();
+        return await userService.GetUserAchievementsAsync();
+    }
 
-    [Authorize]
+
+    [AllowAnonymous]
     [HttpGet("user-educations")]
     public virtual async Task<IEnumerable<Education>> GetUserEducationsAsync()
-        => await userService.GetUserEducationsAsync();
+    {
+        CheckAccess();
+        return await userService.GetUserEducationsAsync();
+    }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("user-employees")]
     public virtual async Task<IEnumerable<Employee>> GetUserEmployeesAsync()
-        => await userService.GetUserEmployeesAsync();
-    
-    [Authorize]
+    {
+        CheckAccess();
+        return await userService.GetUserEmployeesAsync();
+    }
+
+    [AllowAnonymous]
     [HttpGet("user-foreign-languages")]
     public virtual async Task<IEnumerable<ForeignLanguage>> GetUserForeignLanguagesAsync()
-        => await userService.GetUserForeignLanguagesAsync();
+    {
+        CheckAccess();
+        return await userService.GetUserForeignLanguagesAsync();
+    }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("user-programming-languages")]
     public virtual async Task<IEnumerable<ProgrammingLanguage>> GetUserProgrammingLanguagesAsync()
-        => await userService.GetUserProgrammingLanguagesAsync();
+    {
+        CheckAccess();
+        return await userService.GetUserProgrammingLanguagesAsync();
+    }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("user-projects")]
     public virtual async Task<IEnumerable<Project>> GetUserProjectsAsync()
-        => await userService.GetUserProjectsAsync();
+    {
+        CheckAccess();
+        return await userService.GetUserProjectsAsync();
+    }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("user-technologies")]
     public virtual async Task<IEnumerable<Technology>> GetUserTechnologiesAsync()
-        => await userService.GetUserTechnologiesAsync();
+    {
+        CheckAccess();
+        return await userService.GetUserTechnologiesAsync();
+    }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("{userId}/password")]
     public async Task<bool> HasPassword(string userId)
-       => await userService.HasUserPasswordAsync(userId);
+    {
+        await CheckAccessForUser(userId);
+        return await userService.HasUserPasswordAsync(userId);
+    }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpPut("password")]
     public async Task<IActionResult> ChangePassword(ChangePassword model)
-       => await ReturnOkIfEverithingIsGood(async () => await userService.ChangeUserPasswordAsync(model));
+    => await ReturnOkIfEverithingIsGood(async () =>
+    {
+        CheckAccess();
+        await userService.ChangeUserPasswordAsync(model);
+    });
 
     [HttpPost("password")]
     public async Task<IActionResult> CreatePassword(ModelWithUserId<ChangePassword> model)
         => await ReturnOkIfEverithingIsGood(async () => await userService.AddUserPasswordAsync(model));
 
-
+    [AllowAnonymous]
     [HttpGet("{userId}/roles")]
     public async Task<IEnumerable<string>> GetRoles(string userId)
-        => await userService.GetRolesAsync(userId);
+    {
+        await CheckAccessForUser(userId);
+        return await userService.GetRolesAsync(userId);
+    }
 
     [HttpPost("{userId}/role")]
     public async Task<IActionResult> AddRole(string userId, [FromBody] string roleName)
@@ -103,4 +152,20 @@ public class UsersController : DbModelsController<User, string>
     [HttpDelete("{userId}/{roleName}")]
     public async Task<IActionResult> DeleteRole(string userId, string roleName)
         => await ReturnOkIfEverithingIsGood(async () => await userService.DeleteRoleFromUserAsync(userId, roleName));
+
+    async Task CheckAccessForUser(string userId)
+    {
+        User? currentUser = await GetUserByClaimsAsync();
+        if (!(currentUser is User _user && (User.IsInRole(Roles.Admin) || _user.Id == userId)))
+            AccessDenied();
+    }
+
+    void CheckAccess()
+    {
+        if (!User.Identity?.IsAuthenticated ?? false)
+            AccessDenied();
+    }
+
+    void AccessDenied()
+        => throw new UnauthorizedAccessException("Access to this source is denied!");
 }

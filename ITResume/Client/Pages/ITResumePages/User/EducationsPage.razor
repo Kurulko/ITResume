@@ -2,9 +2,8 @@
 @inherits _UserLayout
 
 <CascadingValue Value="5" Name="PageSize">
-    <ComplexEditITResumeDbModels Service="EducationService" TModel="Education" GetModels="@(us => us.GetUserEducationsAsync())">
-        <GridColumns>
-            <GridColumn Field=@nameof(Education.Id) AllowAdding="false" />
+    <ComplexEditUserITResumeDbModels Service="EducationService" TModel="Education" GetModels="@(us => us.GetUserEducationsAsync())">
+        <Columns>
             <GridColumn Field=@nameof(Education.University) />
             <GridColumn Field=@nameof(Education.Faculty) />
             <GridColumn Field=@nameof(Education.Specialty) />
@@ -24,8 +23,8 @@
             </GridColumn>
             <GridColumn Field=@nameof(Education.StartEducation) />
             <GridColumn Field=@nameof(Education.FinishEducation) />
-        </GridColumns>
-    </ComplexEditITResumeDbModels>
+        </Columns>
+    </ComplexEditUserITResumeDbModels>
 </CascadingValue>
 
 

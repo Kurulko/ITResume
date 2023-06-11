@@ -1,11 +1,14 @@
 ﻿@page "/foreign-languages"
+@using ITResume.Client.Shared.EditModels
 @inherits _UserLayout
 
 <CascadingValue Value="10" Name="PageSize">
-    <SimpleEditITResumeDbModels Service="ForeignLanguageService" TModel="ForeignLanguage" GetModels="@(us => us.GetUserForeignLanguagesAsync())">
-        <GridColumns>
-            <GridColumn Field=@nameof(ForeignLanguage.Id) AllowAdding="false" />
-            <GridColumn Field="HumanLanguage.Name" HeaderText="Name">
+    <SimpleEditUserITResumeDbModels Service="ForeignLanguageService" TModel="ForeignLanguage" GetModels="@(us => us.GetUserForeignLanguagesAsync())">
+        <Columns>
+            <GridColumn Field=@nameof(ForeignLanguage.HumanLanguageId) HeaderText="Name">
+                <Template>
+                    @(((ForeignLanguage)context)!.HumanLanguage?.Name ?? "no name")
+                </Template>
                 <EditTemplate>
                     <SfDropDownList TItem="HumanLanguage" TValue="long" DataSource="@humanLanguages"
                                     @bind-Value="@((context as ForeignLanguage)!.HumanLanguageId)">
@@ -13,15 +16,15 @@
                     </SfDropDownList>
                 </EditTemplate>
             </GridColumn>
-            <GridColumn Field=@nameof(ForeignLanguage.LanguageLevel) >
+            <GridColumn Field=@nameof(ForeignLanguage.LanguageLevel)>
                 <EditTemplate>
                     <SfDropDownList ID="LanguageLevel" TItem="string" TValue="LanguageLevel"
                                     @bind-Value="@((context as ForeignLanguage)!.LanguageLevel)"
                                     DataSource="@languageLevelEnumValues" />
                 </EditTemplate>
             </GridColumn>
-        </GridColumns>
-    </SimpleEditITResumeDbModels>
+        </Columns>
+    </SimpleEditUserITResumeDbModels>
 </CascadingValue>
 
 @code {

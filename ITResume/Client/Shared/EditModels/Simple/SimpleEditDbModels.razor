@@ -10,7 +10,7 @@ else
 {
     <center>
         <ShowError Error="@error">
-            <SfGrid @ref="modelGrid" DataSource="models" Toolbar="@GetToolbar()" @bind-AllowPaging="@isAllowPaging"
+            <SfGrid @ref="modelGrid" DataSource="models" Toolbar="@GetToolbar()" @bind-AllowPaging="@isAllowPaging" 
                 @bind-AllowSorting="isAllowOperationsWithModels" @bind-AllowFiltering="isAllowOperationsWithModels" Width="50%" ClipMode="ClipMode.EllipsisWithTooltip">
                 @if (isDetails)
                 {
@@ -24,7 +24,7 @@ else
                 }
                 <GridFilterSettings Mode="FilterBarMode.Immediate" ImmediateModeDelay="200" />
                 <GridSortSettings AllowUnsort="false" />
-                <GridEditSettings @bind-AllowAdding="IsAllowChanging" @bind-AllowEditing="IsAllowChanging" @bind-AllowDeleting="IsAllowChanging" />
+                <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" />
                 <GridEvents OnActionBegin="ActionBeginHandler" TValue="TModel" />
                 <GridPageSettings PageSize="PageSize" />
                 @ChildContent

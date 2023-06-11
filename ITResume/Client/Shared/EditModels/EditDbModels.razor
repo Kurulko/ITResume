@@ -18,9 +18,6 @@
     [CascadingParameter(Name = "PageSize")]
     public int PageSize { get; set; }
 
-    [CascadingParameter(Name = "IsAllowChanging")]
-    public bool IsAllowChanging { get; set; } = true;
-
     protected bool isDetails => RowDetails is not null;
 
     [Parameter]
