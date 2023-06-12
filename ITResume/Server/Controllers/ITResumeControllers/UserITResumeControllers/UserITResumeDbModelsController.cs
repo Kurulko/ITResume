@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using ITResume.Shared.Models.Database;
+using ITResume.Shared.Models.Database.ITResumeModels.UserModels;
 using ITResume.Shared.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ITResume.Server.Controllers.ITResumeControllers;
 
-[Route("api/human-languages")]
-public class HumanLanguagesController : AdminITResumeDbModelsController<HumanLanguage>
+public class TechnologiesController : AdminITResumeDbModelsController<Technology>
 {
-    public HumanLanguagesController(IHumanLanguageService service) : base(service) { }
+    public TechnologiesController(ITechnologyService service) : base(service) { }
+
 }

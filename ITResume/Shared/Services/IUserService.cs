@@ -1,5 +1,7 @@
 ﻿using ITResume.Shared.Models.Account;
 using ITResume.Shared.Models.Database;
+using ITResume.Shared.Models.Database.ITResumeModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UserModels;
 using ITResume.Shared.Models.ViewModels;
 using System;
 using System.Collections.Generic;

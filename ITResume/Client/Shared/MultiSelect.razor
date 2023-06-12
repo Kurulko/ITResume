@@ -6,10 +6,10 @@
     <MultiSelectFieldSettings Text="@nameof(ProgrammingLanguage.Name)" />
 </SfMultiSelect>
 *@
-<SfMultiSelect TValue="IEnumerable<TItem>" TItem="TItem" Placeholder="@Placeholder" DataSource="@AllItems"
+<SfMultiSelect TValue="IEnumerable<string>" TItem="TItem" Placeholder="@Placeholder" DataSource="@AllItems"
                Mode="VisualMode.CheckBox" Value="CurrentValues" ValueChanged="HandleItemsSelection2">
     @*<MultiSelectEvents TValue="IEnumerable<TItem>" TItem="TItem" ValueChange="@HandleItemsSelection" />*@
-    <MultiSelectFieldSettings Text="@TextFieldStr" />
+    <MultiSelectFieldSettings Text="@TextFieldStr" Value="Name"/>
 </SfMultiSelect>
 
 @code {
@@ -17,10 +17,10 @@
     public IEnumerable<TItem> AllItems { get; set; } = null!;
 
     [Parameter]
-    public Func<IEnumerable<TItem>, Task> SaveAsync { get; set; } = null!;
+    public Func<IEnumerable<string>, Task> SaveAsync { get; set; } = null!;
 
     [Parameter]
-    public IEnumerable<TItem> CurrentValues { get; set; } = null!;
+    public IEnumerable<string> CurrentValues { get; set; } = null!;
 
     [Parameter]
     public string? Placeholder { get; set; }
@@ -31,12 +31,12 @@
     [Parameter]
     public string TextFieldStr { get; set; } = null!;
 
-    async Task HandleItemsSelection(MultiSelectChangeEventArgs<IEnumerable<TItem>> selectedValues)
+    async Task HandleItemsSelection(MultiSelectChangeEventArgs<IEnumerable<string>> selectedValues)
     {
         Console.WriteLine(selectedValues.Value?.Count() ?? -1);
         await SaveAsync(selectedValues.Value);
     }
-    async Task HandleItemsSelection2(IEnumerable<TItem> selectedValues)
+    async Task HandleItemsSelection2(IEnumerable<string> selectedValues)
     {
         Console.WriteLine(selectedValues?.Count() ?? -1);
         await SaveAsync(selectedValues);

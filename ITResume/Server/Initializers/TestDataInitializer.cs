@@ -1,9 +1,11 @@
 ﻿using ITResume.Server.Managers.ITResumeManagers.UserITResumeManager;
 using ITResume.Server.Services.ITResumeManagers;
 using ITResume.Shared.Enums;
-using ITResume.Shared.Models.Database;
+using ITResume.Shared.Models.Database.ITResumeModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UserModels;
 using ITResume.Shared.Services;
 using ITResume.Shared.Services.ITResumeServices;
+using ITResume.Shared.Services.ITResumeServices.UserServices;
 using Microsoft.AspNetCore.Identity;
 
 namespace ITResume.Server.Initializers;

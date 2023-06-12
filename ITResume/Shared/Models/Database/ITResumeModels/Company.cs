@@ -5,8 +5,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ITResume.Shared.Models.Database.ITResumeModels.UserModels;
 
-namespace ITResume.Shared.Models.Database;
+namespace ITResume.Shared.Models.Database.ITResumeModels;
 
 public class Company : ITResumeDbModel
 {

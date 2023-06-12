@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace ITResume.Shared.Models.Database;
+namespace ITResume.Shared.Models.Database.ITResumeModels.UserModels;
 
 public class UserDetails : UserITResumeDbModel
 {

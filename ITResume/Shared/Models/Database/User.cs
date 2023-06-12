@@ -1,4 +1,6 @@
 ﻿using ITResume.Shared.Enums;
+using ITResume.Shared.Models.Database.ITResumeModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UserModels;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;

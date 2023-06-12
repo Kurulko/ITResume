@@ -1,4 +1,5 @@
 ﻿using ITResume.Shared.Enums;
+using ITResume.Shared.Models.Database.ITResumeModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace ITResume.Shared.Models.Database;
+namespace ITResume.Shared.Models.Database.ITResumeModels.UserModels;
 
 public class ForeignLanguage : UserITResumeDbModel
 {

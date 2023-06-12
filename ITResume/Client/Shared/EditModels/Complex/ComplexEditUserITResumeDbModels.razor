@@ -4,7 +4,7 @@
 <ComplexEditDbModels IdFromModel="@((TModel model) => model.Id)" Service="Service"
         GetModels="@(() => GetModels(UserService))" HeaderTemplate="HeaderTemplate" RowDetails="RowDetails">
     <GridColumns>
-        <GridColumn Field=@nameof(ITResumeDbModel.Id) AllowAdding="false" Visible="isAdmin" />
+        <GridColumn Field=@nameof(UserITResumeDbModel.Id) AllowAdding="false" Visible="isAdmin" />
         @Columns
     </GridColumns>
     @ChildContent

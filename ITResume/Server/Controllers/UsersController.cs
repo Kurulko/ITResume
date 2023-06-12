@@ -1,6 +1,5 @@
 ﻿using ITResume.Shared.Models.Account;
 using ITResume.Shared;
-using ITResume.Shared.Models.Database;
 using ITResume.Shared.Models.ViewModels;
 using ITResume.Shared.Services;
 using ITResume.Shared.Services.ITResumeServices;
@@ -9,7 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Octokit;
 using User = ITResume.Shared.Models.Database.User;
-using Project = ITResume.Shared.Models.Database.Project;
+using Project = ITResume.Shared.Models.Database.ITResumeModels.UserModels.Project;
+using System.Security.Claims;
+using ITResume.Shared.Models.Database.ITResumeModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UserModels;
 
 namespace ITResume.Server.Controllers;
 
@@ -22,7 +24,7 @@ public class UsersController : AdminDbModelsController<User, string>
     [AllowAnonymous]
     public override async Task<User?> GetModelByIdAsync(string key)
     {
-        await CheckAccessForUser(key);
+        CheckAccessForUser(key);
         return await base.GetModelByIdAsync(key);
     }
 
@@ -34,6 +36,12 @@ public class UsersController : AdminDbModelsController<User, string>
         return await userService.GetUserByClaimsAsync(User);
     }
 
+    [AllowAnonymous]
+    public override async Task<IActionResult> UpdateModelAsync(User model)
+    {
+        CheckAccessForUser(model.Id);
+        return await base.UpdateModelAsync(model);
+    }
 
     [HttpGet("name")]
     public virtual async Task<User?> GetUserByNameAsync(string name)
@@ -120,7 +128,7 @@ public class UsersController : AdminDbModelsController<User, string>
     [HttpGet("{userId}/password")]
     public async Task<bool> HasPassword(string userId)
     {
-        await CheckAccessForUser(userId);
+        CheckAccessForUser(userId);
         return await userService.HasUserPasswordAsync(userId);
     }
 
@@ -141,7 +149,7 @@ public class UsersController : AdminDbModelsController<User, string>
     [HttpGet("{userId}/roles")]
     public async Task<IEnumerable<string>> GetRoles(string userId)
     {
-        await CheckAccessForUser(userId);
+        CheckAccessForUser(userId);
         return await userService.GetRolesAsync(userId);
     }
 
@@ -153,10 +161,9 @@ public class UsersController : AdminDbModelsController<User, string>
     public async Task<IActionResult> DeleteRole(string userId, string roleName)
         => await ReturnOkIfEverithingIsGood(async () => await userService.DeleteRoleFromUserAsync(userId, roleName));
 
-    async Task CheckAccessForUser(string userId)
+    void CheckAccessForUser(string userId)
     {
-        User? currentUser = await GetUserByClaimsAsync();
-        if (!(currentUser is User _user && (User.IsInRole(Roles.Admin) || _user.Id == userId)))
+        if (!(User.IsInRole(Roles.Admin) || User.FindFirstValue(ClaimTypes.NameIdentifier) == userId))
             AccessDenied();
     }
 

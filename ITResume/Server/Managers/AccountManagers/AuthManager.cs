@@ -9,6 +9,7 @@ using ITResume.Shared.Services.ITResumeServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
+using ITResume.Shared.Services.ITResumeServices.UserServices;
 
 namespace ITResume.Server.Managers.AccountManagers;
 

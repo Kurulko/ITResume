@@ -1,9 +1,6 @@
 ﻿@page "/"
 @page "/index"
 @using ITResume.Client.Parser;
-@using ITResume.Client.Pages.ITResumePages.User;
-@using ITResume.Client.Pages.ITResumePages.User.ContactPages;
-@using System.Linq.Expressions;
 @inherits _UserLayout
 
 
@@ -33,7 +30,7 @@
                                     <b>@education.University</b>
                                     <br />
                                     @education.DegreeOfEducation, "@education.Specialty"
-                                    - @((DateTime.Now - education.StartEducation).TotalDays / 365) course
+                                    - @(DateTime.Now.Year - education.StartEducation.Year) course
                                 </RowBody>
                             </DisplayUserModels>
                             <hr />
@@ -139,13 +136,13 @@
                                         @if (experience.Technologies is not null)
                                         {
                                             <text>Technologies:</text>
-                                            @string.Join(',', experience.Technologies!.Select(t => t.Name))
+                                            @StringExtensions.ToString(experience.Technologies)
                                             <br />
                                         }
                                         @if (experience.ProgrammingLanguages is not null)
                                         {
                                             <text>Programming languages:</text>
-                                            @string.Join(',', experience.ProgrammingLanguages!.Select(t => t.Name))
+                                            @StringExtensions.ToString(experience.ProgrammingLanguages)
                                             < br />
                                         }
                                         @experience.StartWorking.ToString("MMMM yyyy") - @(experience.FinishWorking?.ToString("MMMM yyyy") ?? "now")
@@ -164,13 +161,13 @@
                                     @if (project.Technologies is not null)
                                     {
                                         <text>Technologies:</text>
-                                        @string.Join(',', project.Technologies!.Select(t => t.Name))
+                                        @StringExtensions.ToString(project.Technologies)
                                         <br />
                                     }
                                     @if (project.ProgrammingLanguages is not null)
                                     {
                                         <text>Programming languages:</text>
-                                        @string.Join(',', project.ProgrammingLanguages!.Select(t => t.Name))
+                                        @StringExtensions.ToString(project.ProgrammingLanguages)
                                         <br />
                                     }
                                     Work example: @project.WorkExample<br />

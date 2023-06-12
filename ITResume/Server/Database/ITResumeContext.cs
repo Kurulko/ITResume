@@ -1,5 +1,7 @@
 ﻿using ITResume.Server.Initializers.ITResumeInitializers;
 using ITResume.Shared.Models.Database;
+using ITResume.Shared.Models.Database.ITResumeModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UserModels;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,8 +37,11 @@ public class ITResumeContext : IdentityDbContext<User, Role, string>
         var humanLanguages = HumanLanguagesInitializer.GetAllHumanLanguages();
         builder.Entity<HumanLanguage>().HasData(AddValueForId(humanLanguages));
 
-        var programmingLanguages = ProgrammingLanguagesInitializer.GetAllProgrammingLanguages().Result;
+        var programmingLanguages = ProgrammingLanguagesInitializer.GetAllProgrammingLanguagesAsync().Result;
         builder.Entity<ProgrammingLanguage>().HasData(AddValueForId(programmingLanguages));
+
+        var technologies = TechnologiesInitializer.GetSomeTechnologies();
+        builder.Entity<Technology>().HasData(AddValueForId(technologies));
     }
 
     IEnumerable<ITResumeDbModel> AddValueForId(IEnumerable<ITResumeDbModel> models)

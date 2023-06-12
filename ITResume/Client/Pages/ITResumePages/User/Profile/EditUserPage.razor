@@ -7,6 +7,9 @@
 }
 else
 {
+    if (user!.UserDetails is null)
+        user.UserDetails = new();
+
     <SimpleForm Model="@user" DoAction="Action" Mode="@ITResume.Client.Enums.EditMode.Edit.ToString()">
         <div class="form-group">
             <DisplayName For="(() => user.UserName)" />
@@ -39,9 +42,9 @@ else
         </div>
         <br />
         <div class="form-group">
-            <DisplayName For="(() => user!.UserDetails!.IsPublicProfile)" />
-            <SfDatePicker @bind-Value="user!.UserDetails!.IsPublicProfile" Placeholder="Is Public" />
-            <ValidationMessage For="@(() => user!.UserDetails!.IsPublicProfile)" />
+            <DisplayName For="(() => user.UserDetails!.IsPublicProfile)" />
+            <SfCheckBox @bind-Checked="user.UserDetails!.IsPublicProfile"/>
+            <ValidationMessage For="@(() => user.UserDetails!.IsPublicProfile)" />
         </div>
         <br />
         <div class="form-group">

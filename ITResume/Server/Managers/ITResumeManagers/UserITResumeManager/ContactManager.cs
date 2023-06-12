@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ITResume.Shared.Services.ITResumeServices;
 using ITResume.Server.Database;
 using ITResume.Server.Services.ITResumeManagers;
 using Microsoft.EntityFrameworkCore;
-using ITResume.Shared.Models.Database;
 using ITResume.Shared.Services;
+using ITResume.Shared.Models.Database.ITResumeModels.UserModels;
+using ITResume.Shared.Services.ITResumeServices.UserServices;
 
 namespace ITResume.Server.Managers.ITResumeManagers.UserITResumeManager;
 

@@ -1,59 +1,63 @@
 ﻿@page "/projects"
-@using Syncfusion.Blazor.DropDowns
 @inherits _UserLayout
 
 
 @if (allLanguages is not null)
 {
     <CascadingValue Value="20" Name="PageSize">
-        <ComplexEditUserITResumeDbModels Service="ProjectService" TModel="Project" Context="project" GetModels="@(us => us.GetUserProjectsAsync())">
-            <Columns>
-                <GridColumn Field=@nameof(Project.Name) />
-                <GridColumn Field=@nameof(Project.Github) />
-                <GridColumn Field=@nameof(Project.WorkExample) />
-                <GridColumn Field=@nameof(Project.Description)>
-                    <Template>
-                        @((context as Project)!.Description)
-                    </Template>
-                    <EditTemplate>
-                        <span>Description</span>
-                        <SfTextBox @bind-Value="(context as Project)!.Description" Multiline=true />
-                    </EditTemplate>
-                </GridColumn>
-                <GridColumn Field=@nameof(Project.StartDoing) />
-                <GridColumn Field=@nameof(Project.FinishDoing) />
-                <GridColumn Field=@nameof(Project.ProgrammingLanguages) HeaderText="Languages">
-                    <Template>
-                        @((context as IEnumerable<Technology>)?.Count() ?? -1)
-                        @DisplayProgrammingLanguages(context)
-                    </Template>
-                    <EditTemplate>
-                        @{
-                            Project project = context as Project ?? new();
-                            Console.WriteLine(project.ProgrammingLanguages?.Count() ?? -1);
-                        }
+            <ComplexEditUserITResumeDbModels Service="ProjectService" TModel="Project" Context="project" GetModels="@(us => us.GetUserProjectsAsync())">
+                <Columns>
+                    <GridColumn Field=@nameof(Project.Name) />
+                    <GridColumn Field=@nameof(Project.Github) />
+                    <GridColumn Field=@nameof(Project.WorkExample) />
+                    <GridColumn Field=@nameof(Project.Description)>
+                        <EditTemplate>
+                            <span>Description</span>
+                            <SfTextBox @bind-Value="(context as Project)!.Description" Multiline=true />
+                        </EditTemplate>
+                    </GridColumn>
+                    <GridColumn Field=@nameof(Project.StartDoing) />
+                    <GridColumn Field=@nameof(Project.FinishDoing) />
+                    <GridColumn Field=@nameof(Project.Technologies) HeaderText="Technologies" AllowGrouping="false" AllowSorting="false">
+                        <Template>
+                            @StringExtensions.ToString((context as Project)!.Technologies)
+                        </Template>
+                        <EditTemplate>
+                            @{
+                                Employee employee = context as Employee ?? new();
+                            }
+                            @*<MultiSelect AllItems="allTechnologies" Placeholder="Select a language" Title="Technologies" TextFieldStr="@nameof(Technology.Name)"
+                        SaveAsync="@(technologies => Task.FromResult(employee.Technologies = technologies))" CurrentValues="employee.Technologies" />
+                        *@
+                        </EditTemplate>
+                    </GridColumn>
+
+                    <GridColumn Field=@nameof(Project.ProgrammingLanguages) HeaderText="Languages" AllowGrouping="false" AllowSorting="false">
+                        <Template>
+                            @StringExtensions.ToString((context as Project)!.ProgrammingLanguages)
+                        </Template>
+                        <EditTemplate>
+                            @{
+                                Project project = context as Project ?? new();
+                            }
+                            <SfMultiSelect TValue="IList<ProgrammingLanguage>" TItem="ProgrammingLanguage" Placeholder="Programming Languages" DataSource="@allLanguages"
+                                       Mode="VisualMode.CheckBox" @bind-Value="project.ProgrammingLanguages">
+                                <MultiSelectFieldSettings Text="Name" />
+                            </SfMultiSelect>
+
+
+                            @*
                         <MultiSelect AllItems="allLanguages" Placeholder="Select a language" Title="Programming Languages" TextFieldStr="@nameof(ProgrammingLanguage.Name)"
-                                 SaveAsync="@(languages => Task.FromResult(project.ProgrammingLanguages = languages))" CurrentValues="project.ProgrammingLanguages" />
-                    </EditTemplate>
-                </GridColumn>
-                <GridColumn Field=@nameof(Project.Technologies) HeaderText="Technologies">
-                    <Template>
-                        @DisplayTechnologies(context)
-                    </Template>
-                    <EditTemplate>
-                        @{
-                            Employee employee = context as Employee ?? new();
-                        }
-                        <MultiSelect AllItems="allTechnologies" Placeholder="Select a language" Title="Technologies" TextFieldStr="@nameof(Technology.Name)"
-                                 SaveAsync="@(technologies => Task.FromResult(employee.Technologies = technologies))" CurrentValues="employee.Technologies" />
-                    </EditTemplate>
-                </GridColumn>
-            </Columns>
-            <RowDetails>
-                <td colspan="6">@project.Description</td>
-            </RowDetails>
-        </ComplexEditUserITResumeDbModels>
-    </CascadingValue>
+                        SaveAsync="@(languages => Task.FromResult(string.Empty))" CurrentValues="null" />
+                        *@
+                        </EditTemplate>
+                    </GridColumn>
+                </Columns>
+                <RowDetails>
+                    <td colspan="6">@project.Description</td>
+                </RowDetails>
+            </ComplexEditUserITResumeDbModels>
+        </CascadingValue>
 }
 
 
@@ -69,12 +73,6 @@
 
     [Inject]
     public ITechnologyService TechnologyService { get; set; } = null!;
-
-    string DisplayProgrammingLanguages(object context)
-        => string.Join(",", (context as IEnumerable<ProgrammingLanguage>)?.Select(pl => pl.Name) ?? Enumerable.Empty<string>());
-
-    string DisplayTechnologies(object context)
-        => string.Join(",", (context as IEnumerable<Technology>)?.Select(pl => pl.Name) ?? Enumerable.Empty<string>());
 
     protected override async Task OnInitializedAsync()
     {

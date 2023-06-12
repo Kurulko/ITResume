@@ -21,27 +21,27 @@
             </GridColumn>
             <GridColumn Field=@nameof(Project.ProgrammingLanguages) HeaderText="Languages">
                 <Template>
-                    @DisplayProgrammingLanguages(context)
+                    @StringExtensions.ToString((context as Project)!.ProgrammingLanguages)
                 </Template>
                 <EditTemplate>
                     @{
                         Project project = context as Project ?? new();
                     }
-                    <MultiSelect AllItems="allLanguages" Placeholder="Select a language" Title="Programming Languages" TextFieldStr="@nameof(ProgrammingLanguage.Name)"
+                    @*<MultiSelect AllItems="allLanguages" Placeholder="Select a language" Title="Programming Languages" TextFieldStr="@nameof(ProgrammingLanguage.Name)"
                                  SaveAsync="@(languages => Task.FromResult(project.ProgrammingLanguages = languages))" CurrentValues="project.ProgrammingLanguages" />
-                </EditTemplate>
+                *@</EditTemplate>
             </GridColumn>
             <GridColumn Field=@nameof(Project.Technologies) HeaderText="Technologies">
                 <Template>
-                    @DisplayTechnologies(context)
+                    @StringExtensions.ToString((context as Project)!.Technologies)
                 </Template>
                 <EditTemplate>
                     @{
                         Employee employee = context as Employee ?? new();
                     }
-                    <MultiSelect AllItems="allTechnologies" Placeholder="Select a language" Title="Technologies" TextFieldStr="@nameof(Technology.Name)"
+                    @*<MultiSelect AllItems="allTechnologies" Placeholder="Select a language" Title="Technologies" TextFieldStr="@nameof(Technology.Name)"
                                  SaveAsync="@(technologies => Task.FromResult(employee.Technologies = technologies))" CurrentValues="employee.Technologies" />
-                </EditTemplate>
+               *@ </EditTemplate>
             </GridColumn>
         </Columns>
         <RowDetails>

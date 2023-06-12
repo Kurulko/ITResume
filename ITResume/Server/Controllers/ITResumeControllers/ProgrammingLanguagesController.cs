@@ -1,4 +1,4 @@
-﻿using ITResume.Shared.Models.Database;
+﻿using ITResume.Shared.Models.Database.ITResumeModels;
 using ITResume.Shared.Services;
 using ITResume.Shared.Services.ITResumeServices;
 using Microsoft.AspNetCore.Mvc;

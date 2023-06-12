@@ -7,7 +7,7 @@ using ITResume.Shared.Services.ITResumeServices;
 using ITResume.Server.Database;
 using ITResume.Server.Services.ITResumeManagers;
 using Microsoft.EntityFrameworkCore;
-using ITResume.Shared.Models.Database;
+using ITResume.Shared.Models.Database.ITResumeModels;
 
 namespace ITResume.Server.Managers.ITResumeManagers;
 

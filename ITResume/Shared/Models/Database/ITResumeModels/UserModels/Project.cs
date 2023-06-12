@@ -6,8 +6,9 @@ using System.Linq;
 using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
+using ITResume.Shared.Models.Database.ITResumeModels;
 
-namespace ITResume.Shared.Models.Database;
+namespace ITResume.Shared.Models.Database.ITResumeModels.UserModels;
 
 public class Project : UserITResumeDbModel
 {
@@ -34,5 +35,5 @@ public class Project : UserITResumeDbModel
 
     public string? UserId { get; set; }
     public IEnumerable<Technology>? Technologies { get; set; }
-    public IEnumerable<ProgrammingLanguage>? ProgrammingLanguages { get; set; }
+    public IList<ProgrammingLanguage>? ProgrammingLanguages { get; set; }
 }

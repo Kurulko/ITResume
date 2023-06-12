@@ -1,6 +1,8 @@
 ﻿using ITResume.Server.Database;
 using ITResume.Shared.Models.Account;
 using ITResume.Shared.Models.Database;
+using ITResume.Shared.Models.Database.ITResumeModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UserModels;
 using ITResume.Shared.Models.ViewModels;
 using ITResume.Shared.Services;
 using Microsoft.AspNetCore.Http;
@@ -77,7 +79,7 @@ public class UserManager : IUserService
     }
 
     public async Task<User?> GetUserByClaimsAsync(ClaimsPrincipal claims)
-        => await GetModelByIdAsync(claims.FindFirstValue(ClaimTypes.NameIdentifier));
+        => await GetModelByIdAsync(claims.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
     public async Task<IEnumerable<Achievement>> GetUserAchievementsAsync()
     {
@@ -147,7 +149,7 @@ public class UserManager : IUserService
     public async Task<User?> GetUserByNameAsync(string name)
     {
         getModels = getModels.Include(u => u.UserDetails);
-        return await getModels.FirstOrDefaultAsync(u => u.UserName.ToLower() == name.ToLower());
+        return await getModels.FirstOrDefaultAsync(u => u.UserName!.ToLower() == name.ToLower());
     }
 
 
@@ -174,7 +176,7 @@ public class UserManager : IUserService
     {
         ChangePassword password = model;
         User user = await GetUsedUserAsync();
-        IdentityResult res = await userManager.ChangePasswordAsync(user, password.OldPassword, password.NewPassword);
+        IdentityResult res = await userManager.ChangePasswordAsync(user, password.OldPassword!, password.NewPassword);
         if (!res.Succeeded)
             throw new Exception(string.Join("; ", res.Errors.Select(e => e.Description)));
     }

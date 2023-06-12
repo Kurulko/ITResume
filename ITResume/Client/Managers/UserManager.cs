@@ -1,6 +1,7 @@
 ﻿using ITResume.Client.Managers.ITResumeManagers;
 using ITResume.Shared.Models.Account;
-using ITResume.Shared.Models.Database;
+using ITResume.Shared.Models.Database.ITResumeModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UserModels;
 using ITResume.Shared.Models.ViewModels;
 using ITResume.Shared.Services;
 using ITResume.Shared.Services.ITResumeServices;
@@ -18,7 +19,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using Project = ITResume.Shared.Models.Database.Project;
+using Project = ITResume.Shared.Models.Database.ITResumeModels.UserModels.Project;
 using User = ITResume.Shared.Models.Database.User;
 
 namespace ITResume.Client.Managers;

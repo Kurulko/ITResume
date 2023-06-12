@@ -1,4 +1,4 @@
-﻿using ITResume.Shared.Models.Database;
+﻿using ITResume.Shared.Models.Database.ITResumeModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

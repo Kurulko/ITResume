@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using ITResume.Shared.Services.ITResumeServices;
 using Microsoft.EntityFrameworkCore;
 using ITResume.Client.Managers.ITResumeManagers;
-using ITResume.Shared.Models.Database;
+using ITResume.Shared.Models.Database.ITResumeModels;
 
 namespace ITResume.Client.Managers.ITResumeServices;
 

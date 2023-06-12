@@ -13,6 +13,8 @@ using Syncfusion.Blazor;
 using ITResume.Shared.Models.Database;
 using ITResume.Client.Managers.AccountManagers;
 using ITResume.Shared.Services.Account;
+using ITResume.Shared.Services.ITResumeServices.UserServices;
+using ITResume.Client.Managers.ITResumeManagers.UserITResumeManagers;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");

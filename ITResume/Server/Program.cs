@@ -7,6 +7,7 @@ using ITResume.Shared.Models.Database;
 using ITResume.Shared.Services;
 using ITResume.Shared.Services.Account;
 using ITResume.Shared.Services.ITResumeServices;
+using ITResume.Shared.Services.ITResumeServices.UserServices;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

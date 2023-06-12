@@ -1,8 +1,9 @@
 ﻿using ITResume.Client.Parser.Linkedin.Models;
-using ITResume.Shared.Models.Database;
+using ITResume.Shared.Models.Database.ITResumeModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UserModels;
 using Newtonsoft.Json;
 using Octokit;
-using Project = ITResume.Shared.Models.Database.Project;
+using Project = ITResume.Shared.Models.Database.ITResumeModels.UserModels.Project;
 
 namespace ITResume.Client.Parser.Linkedin;
 

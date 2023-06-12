@@ -1,0 +1,16 @@
+﻿@page "/programming-languages"
+@inherits _AdminLayout
+
+<CascadingValue Value="50" Name="PageSize">
+    <SimpleEditITResumeDbModels Service="TechnologyService" TModel="Technology">
+        <Columns>
+            <GridColumn Field=@nameof(Technology.Name)
+                        FilterSettings="@(new FilterSettings() { Operator = Operator.Contains })" />
+        </Columns>
+    </SimpleEditITResumeDbModels>
+</CascadingValue>
+
+@code {
+    [Inject]
+    public ITechnologyService TechnologyService { get; set; } = null!;
+}

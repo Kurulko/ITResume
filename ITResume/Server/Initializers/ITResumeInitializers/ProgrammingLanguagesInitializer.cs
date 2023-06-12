@@ -1,5 +1,5 @@
 ﻿using ITResume.Server.Settings;
-using ITResume.Shared.Models.Database;
+using ITResume.Shared.Models.Database.ITResumeModels;
 using Newtonsoft.Json;
 using System.Globalization;
 
@@ -7,7 +7,7 @@ namespace ITResume.Server.Initializers.ITResumeInitializers;
 
 public class ProgrammingLanguagesInitializer
 {
-    public static async Task<IEnumerable<ProgrammingLanguage>> GetAllProgrammingLanguages()
+    public static async Task<IEnumerable<ProgrammingLanguage>> GetAllProgrammingLanguagesAsync()
     {
         Uri url = new Uri("https://api.github.com/languages");
         HttpClient httpClient = new HttpClient() { BaseAddress = url };
