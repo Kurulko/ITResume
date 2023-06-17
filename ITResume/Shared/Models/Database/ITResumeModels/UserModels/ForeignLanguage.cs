@@ -1,5 +1,5 @@
 ﻿using ITResume.Shared.Enums;
-using ITResume.Shared.Models.Database.ITResumeModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UniqueNameModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

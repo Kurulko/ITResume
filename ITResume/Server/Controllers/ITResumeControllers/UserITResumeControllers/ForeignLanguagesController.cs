@@ -9,14 +9,4 @@ namespace ITResume.Server.Controllers.ITResumeControllers.UserITResumeController
 public class ForeignLanguagesController : UserITResumeDbModelsController<ForeignLanguage>
 {
     public ForeignLanguagesController(IForeignLanguageService service, IUserService userService) : base(service, userService) { }
-
-    protected override ForeignLanguage? ReturnModelWithoutCycles(ForeignLanguage? model)
-    {
-        if (model is not null && model.User is not null)
-        {
-            model.User!.ForeignLanguages = null;
-            return model;
-        }
-        return model;
-    }
 }

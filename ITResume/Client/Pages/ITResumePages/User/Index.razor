@@ -1,6 +1,5 @@
 ﻿@page "/"
 @page "/index"
-@using ITResume.Client.Parser;
 @inherits _UserLayout
 
 
@@ -143,7 +142,7 @@
                                         {
                                             <text>Programming languages:</text>
                                             @StringExtensions.ToString(experience.ProgrammingLanguages)
-                                            < br />
+                                            <br />
                                         }
                                         @experience.StartWorking.ToString("MMMM yyyy") - @(experience.FinishWorking?.ToString("MMMM yyyy") ?? "now")
                                     </b>

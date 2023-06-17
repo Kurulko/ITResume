@@ -2,7 +2,7 @@
 @inherits EditITResumeDbModels<TModel>
 
 <ComplexEditDbModels IdFromModel="@((TModel model) => model.Id)" Service="Service"
-        HeaderTemplate="HeaderTemplate" RowDetails="RowDetails">
+                     HeaderTemplate="HeaderTemplate" RowDetails="RowDetails" PrepareModelBeforeSaving="PrepareModelBeforeSaving">
      <GridColumns>
         <GridColumn Field=@nameof(ITResumeDbModel.Id) AllowAdding="false" />
         @Columns

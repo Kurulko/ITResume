@@ -1,5 +1,5 @@
 ﻿using ITResume.Shared.Enums;
-using ITResume.Shared.Models.Database.ITResumeModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UniqueNameModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -36,6 +36,6 @@ public class Education : UserITResumeDbModel
     public DateTime? FinishEducation { get; set; }
 
     public string? UserId { get; set; }
-    public long CountryId { get; set; }
+    public long? CountryId { get; set; }
     public Country? Country { get; set; }
 }

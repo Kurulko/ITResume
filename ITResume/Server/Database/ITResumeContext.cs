@@ -1,9 +1,13 @@
 ﻿using ITResume.Server.Initializers.ITResumeInitializers;
 using ITResume.Shared.Models.Database;
 using ITResume.Shared.Models.Database.ITResumeModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UniqueNameModels;
 using ITResume.Shared.Models.Database.ITResumeModels.UserModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UserModels.SkillUserModels;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
+using System.Xml;
 
 namespace ITResume.Server.Database;
 
@@ -29,19 +33,27 @@ public class ITResumeContext : IdentityDbContext<User, Role, string>
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(builder);
 
         var countries = CountriesInitializer.GetAllCountries();
         builder.Entity<Country>().HasData(AddValueForId(countries));
 
-        var humanLanguages = HumanLanguagesInitializer.GetAllHumanLanguages();
-        builder.Entity<HumanLanguage>().HasData(AddValueForId(humanLanguages));
+        //var humanLanguages = HumanLanguagesInitializer.GetAllHumanLanguages();
+        //builder.Entity<HumanLanguage>().HasData(AddValueForId(humanLanguages));
+        builder.Entity<HumanLanguage>().HasData(new List<HumanLanguage>()
+        {
+            new HumanLanguage(){Id = 1, Name = "English"},
+            new HumanLanguage(){Id = 2, Name = "Ukrainian"},
+            new HumanLanguage(){Id = 3, Name = "Russian"},
+            new HumanLanguage(){Id = 4, Name = "German"},
+        });
 
         var programmingLanguages = ProgrammingLanguagesInitializer.GetAllProgrammingLanguagesAsync().Result;
         builder.Entity<ProgrammingLanguage>().HasData(AddValueForId(programmingLanguages));
 
         var technologies = TechnologiesInitializer.GetSomeTechnologies();
         builder.Entity<Technology>().HasData(AddValueForId(technologies));
+
+        base.OnModelCreating(builder);
     }
 
     IEnumerable<ITResumeDbModel> AddValueForId(IEnumerable<ITResumeDbModel> models)

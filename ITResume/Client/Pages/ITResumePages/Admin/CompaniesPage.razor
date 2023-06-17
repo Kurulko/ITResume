@@ -1,0 +1,82 @@
+﻿@page "/companies"
+@inherits _AdminLayout
+
+<CascadingValue Value="50" Name="PageSize">
+    <ComplexEditITResumeDbModels Service="CompanyService" TModel="Company" PrepareModelBeforeSaving="PrepareModelBeforeSaving">
+        <Columns>
+            <GridColumn Field=@nameof(Company.Name) />
+            <GridColumn Field=@nameof(Company.Description) />
+            <GridColumn Field=@nameof(Company.StartWorking) />
+            <GridColumn Field=@nameof(Company.FinishWorking) />
+            <GridColumn HeaderText="Technologies" AllowAdding=false AllowEditing=false>
+                <Template>
+                    @StringExtensions.ToString((context as Company)!.Technologies)
+                </Template>
+                <EditTemplate>
+                </EditTemplate>
+            </GridColumn>
+            <GridColumn HeaderText="Languages" AllowAdding=false AllowEditing=false>
+                <Template>
+                    @StringExtensions.ToString((context as Company)!.ProgrammingLanguages)
+                </Template>
+                <EditTemplate>
+                </EditTemplate>
+            </GridColumn>
+        </Columns>
+        <RowDetails>
+            <td colspan="2">
+                @{
+                    Company company = (context as Company)!;
+                    var employees = company.Employees;
+                }
+                @if (employees.IsCountOverZero())
+                {
+                    <span>Employees:</span>
+                    @string.Join(',', employees!.DistinctBy(e => e.UserId).Select(e => GetShortName(e)))
+                }
+                else
+                {
+                    <span>There aren't any employees in @company.Name company</span>
+                }
+            </td>
+        </RowDetails>
+    </ComplexEditITResumeDbModels>
+</CascadingValue>
+
+@code {
+    [Inject]
+    public ICompanyService CompanyService { get; set; } = null!;
+
+    string GetShortName(Employee employee)
+    {
+        string result = string.Empty;
+
+        User user = employee.User!;
+
+        string? lastName = user.LastName;
+        if (!string.IsNullOrEmpty(lastName))
+        {
+            result += lastName;
+
+            string? firstName = user.FirstName;
+            if (!string.IsNullOrEmpty(firstName))
+            {
+                result += $" {firstName.First()}.";
+
+                string? fatherName = user.FatherName;
+                if (!string.IsNullOrEmpty(fatherName))
+                    result += $" {fatherName.First()}.";
+            }
+        }
+        else
+            result += user.UserName;
+
+        return result;
+    }
+
+    Company PrepareModelBeforeSaving(Company company)
+    {
+        company.Employees = null;
+        return company;
+    }
+}

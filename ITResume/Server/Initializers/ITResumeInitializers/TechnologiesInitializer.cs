@@ -1,5 +1,5 @@
 ﻿using ITResume.Server.Settings;
-using ITResume.Shared.Models.Database.ITResumeModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UniqueNameModels;
 using Octokit;
 
 namespace ITResume.Server.Initializers.ITResumeInitializers;
@@ -7,7 +7,7 @@ namespace ITResume.Server.Initializers.ITResumeInitializers;
 public class TechnologiesInitializer
 {
     public static IEnumerable<Technology> GetSomeTechnologies()
-        => frameworks.Select(f => new Technology() { Name = f });
+        => frameworks.Distinct().Select(f => new Technology() { Name = f });
 
     static string[] frameworks =
     {

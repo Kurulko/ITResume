@@ -8,10 +8,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Octokit;
 using User = ITResume.Shared.Models.Database.User;
-using Project = ITResume.Shared.Models.Database.ITResumeModels.UserModels.Project;
+using Project = ITResume.Shared.Models.Database.ITResumeModels.UserModels.SkillUserModels.Project;
 using System.Security.Claims;
-using ITResume.Shared.Models.Database.ITResumeModels;
 using ITResume.Shared.Models.Database.ITResumeModels.UserModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UserModels.SkillUserModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UniqueNameModels;
 
 namespace ITResume.Server.Controllers;
 
@@ -142,7 +143,7 @@ public class UsersController : AdminDbModelsController<User, string>
     });
 
     [HttpPost("password")]
-    public async Task<IActionResult> CreatePassword(ModelWithUserId<ChangePassword> model)
+    public async Task<IActionResult> CreatePassword(ModelWithUserId<string> model)
         => await ReturnOkIfEverithingIsGood(async () => await userService.AddUserPasswordAsync(model));
 
     [AllowAnonymous]
@@ -159,7 +160,7 @@ public class UsersController : AdminDbModelsController<User, string>
 
     [HttpDelete("{userId}/{roleName}")]
     public async Task<IActionResult> DeleteRole(string userId, string roleName)
-        => await ReturnOkIfEverithingIsGood(async () => await userService.DeleteRoleFromUserAsync(userId, roleName));
+        => await ReturnOkIfEverithingIsGood(async () => await userService.DeleteRoleFromUserAsync(new(userId, roleName)));
 
     void CheckAccessForUser(string userId)
     {

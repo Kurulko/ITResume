@@ -22,9 +22,7 @@ else
                         </DetailTemplate>
                     </GridTemplates>
                 }
-                <GridFilterSettings Mode="FilterBarMode.Immediate" ImmediateModeDelay="200" />
-                <GridSortSettings AllowUnsort="false" />
-                <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" />
+                <SimpleEditDbModelsSettings />
                 <GridEvents OnActionBegin="ActionBeginHandler" TValue="TModel" />
                 <GridPageSettings PageSize="PageSize" />
                 @ChildContent

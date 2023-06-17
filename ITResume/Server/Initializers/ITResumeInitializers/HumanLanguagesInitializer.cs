@@ -1,6 +1,14 @@
-﻿using ITResume.Shared.Models.Database.ITResumeModels;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 using System.Resources;
+using System.Security.Policy;
+using ITResume.Shared.Models.Database.ITResumeModels.UniqueNameModels;
 
 namespace ITResume.Server.Initializers.ITResumeInitializers;
 
@@ -24,6 +32,7 @@ public class HumanLanguagesInitializer
         }
     }
 
+
     public static IEnumerable<HumanLanguage> GetAllHumanLanguages()
     {
         SortedSet<string> languagesStr = new();
@@ -33,7 +42,7 @@ public class HumanLanguagesInitializer
                 languagesStr.Add(GetEnglishLanguageName(culture));
 
 
-        IEnumerable<HumanLanguage> anguages = languagesStr.Select(languageStr => new HumanLanguage() { Name = languageStr });
-        return anguages;
+        IEnumerable<HumanLanguage> languages = languagesStr.Distinct().Select(languageStr => new HumanLanguage() { Name = languageStr });
+        return languages;
     }
 }

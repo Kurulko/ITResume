@@ -1,0 +1,21 @@
+﻿<span>@Title</span>
+
+<SfMultiSelect TValue="List<string>" TItem="string" Placeholder="@Placeholder" DataSource="@AllItems"
+               Mode="VisualMode.CheckBox" Value="CurrentValues" ValueChanged="CurrentValuesChanged" AllowFiltering="true"/>
+
+@code {
+    [Parameter]
+    public IEnumerable<string> AllItems { get; set; } = null!;
+
+    [Parameter]
+    public List<string> CurrentValues { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<List<string>> CurrentValuesChanged { get; set; }
+
+    [Parameter]
+    public string? Placeholder { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+}

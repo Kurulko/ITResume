@@ -1,6 +1,7 @@
 ﻿@page "/user/edit"
 @inherits _UserLayout
 
+<DisplayNameEdit Name="@nameof(User)" />
 @if (user is null)
 {
     <Spinner />
@@ -43,7 +44,7 @@ else
         <br />
         <div class="form-group">
             <DisplayName For="(() => user.UserDetails!.IsPublicProfile)" />
-            <SfCheckBox @bind-Checked="user.UserDetails!.IsPublicProfile"/>
+            <SfCheckBox @bind-Checked="user.UserDetails!.IsPublicProfile" />
             <ValidationMessage For="@(() => user.UserDetails!.IsPublicProfile)" />
         </div>
         <br />

@@ -3,6 +3,7 @@ using ITResume.Server.Database;
 using ITResume.Shared.Models.Database.ITResumeModels;
 using ITResume.Shared.Services;
 using ITResume.Shared.Services.ITResumeServices;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace ITResume.Server.Services.ITResumeManagers;
@@ -17,10 +18,11 @@ public abstract class ITResumeManager<T> : IITResumeDbModelService<T> where T : 
     protected virtual IQueryable<T> GetAllModels()
         => AllModels();
 
-    public virtual async Task AddModelAsync(T model)
+    public virtual async Task<T> AddModelAsync(T model)
     {
         await AllModels().AddAsync(model);
         await SaveChangesAsync();
+        return model;
     }
 
     public virtual async Task DeleteModelAsync(long key)

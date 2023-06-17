@@ -14,16 +14,13 @@ public abstract class UserITResumeDbModelsController<T> : ITResumeDbModelsContro
     public UserITResumeDbModelsController(IDbModelService<T, long> service, IUserService userService) : base(service)
         => this.userService = userService;
 
-    protected abstract T? ReturnModelWithoutCycles(T? model);
 
-    public override async Task<IEnumerable<T>> GetModelsAsync()
-        => (await base.GetModelsAsync()).Select(m => ReturnModelWithoutCycles(m)!);
 
     public override async Task<T?> GetModelByIdAsync(long key)
     {
         T? model = await base.GetModelByIdAsync(key);
         await CheckModelWithCurrentUser(model);
-        return ReturnModelWithoutCycles(model);
+        return model;
     }
     
     public override async Task<IActionResult> UpdateModelAsync(T model)

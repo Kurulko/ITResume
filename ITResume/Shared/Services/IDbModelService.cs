@@ -12,6 +12,6 @@ public interface IDbModelService<T,K> where T : IDbModel
     Task<IEnumerable<T>> GetAllModelsAsync();
     Task<T?> GetModelByIdAsync(K key);
     Task UpdateModelAsync(T model);
-    Task AddModelAsync(T model);
+    Task<T> AddModelAsync(T model);
     Task DeleteModelAsync(K key);
 }

@@ -8,14 +8,4 @@ namespace ITResume.Server.Controllers.ITResumeControllers.UserITResumeController
 public class ContactsController : UserITResumeDbModelsController<Contact>
 {
     public ContactsController(IContactService service, IUserService userService) : base(service, userService) { }
-
-    protected override Contact? ReturnModelWithoutCycles(Contact? model)
-    {
-        if (model is not null && model.User is not null)
-        {
-            model.User!.Contact = null;
-            return model;
-        }
-        return model;
-    }
 }

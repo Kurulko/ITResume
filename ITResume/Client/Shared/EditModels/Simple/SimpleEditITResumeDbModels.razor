@@ -1,7 +1,7 @@
 ﻿@typeparam TModel
 @inherits EditITResumeDbModels<TModel>
 
-<SimpleEditDbModels IdFromModel="@((TModel model) => model.Id)" Service="Service" RowDetails="RowDetails">
+<SimpleEditDbModels IdFromModel="@((TModel model) => model.Id)" Service="Service" RowDetails="RowDetails" PrepareModelBeforeSaving="PrepareModelBeforeSaving">
      <GridColumns>
         <GridColumn Field=@nameof(ITResumeDbModel.Id) AllowAdding="false" />
         @Columns

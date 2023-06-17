@@ -1,5 +1,5 @@
 ﻿using ITResume.Server.Settings;
-using ITResume.Shared.Models.Database.ITResumeModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UniqueNameModels;
 using Newtonsoft.Json;
 using System.Globalization;
 

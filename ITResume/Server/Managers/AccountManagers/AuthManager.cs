@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Identity;
 using ITResume.Server.Database;
 using ITResume.Shared.Services.Account;
 using ITResume.Server.Initializers;
-using ITResume.Shared.Services.ITResumeServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using ITResume.Shared.Services.ITResumeServices.UserServices;
+using ITResume.Shared.Services.ITResumeServices.UniqueNameServices;
 
 namespace ITResume.Server.Managers.AccountManagers;
 
@@ -60,9 +60,6 @@ public class AuthManager : IAuthService
             user.Registered = DateTime.Now;
             await signInManager.SignInAsync(user, register.RememberMe);
             await userManager.AddToRolesAsync(user, new List<string>() { Roles.User });
-
-            TestDataInitializer dataInitializer = new(achievementService, contactService, educationService, projectService, technologyService, foreignLanguageService, employeeService, companyService);
-            await dataInitializer.TestDataInitializeAsync();
         }
         else
             throw new Exception(string.Join("; ", result.Errors.Select(e => e.Description)));

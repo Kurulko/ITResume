@@ -19,10 +19,11 @@ public class RoleManager : IRoleService
     public RoleManager(RoleManager<Role> roleManager, ITResumeContext db)
         => (this.roleManager, this.db) = (roleManager, db);
 
-    public async Task AddModelAsync(Role model)
+    public async Task<Role> AddModelAsync(Role model)
     {
         await db.Roles.AddAsync(model);
         db.SaveChanges();
+        return model;
     }
 
     public async Task DeleteModelAsync(string key)

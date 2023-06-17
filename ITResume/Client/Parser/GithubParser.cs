@@ -1,6 +1,6 @@
-﻿using ITResume.Shared.Models.Database.ITResumeModels;
+﻿using ITResume.Shared.Models.Database.ITResumeModels.UniqueNameModels;
 using Octokit;
-using Project = ITResume.Shared.Models.Database.ITResumeModels.UserModels.Project;
+using Project = ITResume.Shared.Models.Database.ITResumeModels.UserModels.SkillUserModels.Project;
 
 namespace ITResume.Client.Parser;
 

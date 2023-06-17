@@ -1,0 +1,21 @@
+﻿<span>@Title</span>
+
+<SfDropDownList TItem="string" TValue="string" DataSource="@AllItems"
+                Value="CurrentValue" ValueChanged="CurrentValueChanged" Placeholder="@Placeholder" />
+
+@code {
+    [Parameter]
+    public IEnumerable<string> AllItems { get; set; } = null!;
+
+    [Parameter]
+    public string CurrentValue { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<string> CurrentValueChanged { get; set; }
+
+    [Parameter]
+    public string? Placeholder { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+}

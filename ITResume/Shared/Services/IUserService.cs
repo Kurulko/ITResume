@@ -1,7 +1,8 @@
 ﻿using ITResume.Shared.Models.Account;
 using ITResume.Shared.Models.Database;
-using ITResume.Shared.Models.Database.ITResumeModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UniqueNameModels;
 using ITResume.Shared.Models.Database.ITResumeModels.UserModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UserModels.SkillUserModels;
 using ITResume.Shared.Models.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -31,9 +32,9 @@ public interface IUserService : IDbModelService<User, string>
     Task<IEnumerable<ProgrammingLanguage>> GetUserProgrammingLanguagesAsync();
 
     Task ChangeUserPasswordAsync(ChangePassword model);
-    Task AddUserPasswordAsync(ModelWithUserId<ChangePassword> model);
+    Task AddUserPasswordAsync(ModelWithUserId<string> model);
     Task<bool> HasUserPasswordAsync(string userId);
     Task<IEnumerable<string>> GetRolesAsync(string userId);
     Task AddRoleToUserAsync(ModelWithUserId<string> model);
-    Task DeleteRoleFromUserAsync(string userId, string roleName);
+    Task DeleteRoleFromUserAsync(ModelWithUserId<string> model);
 }

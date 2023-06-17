@@ -23,8 +23,8 @@ public abstract class DbModelsController<T, K> : ApiController where T : IDbMode
         => await service.GetModelByIdAsync(key);
 
     [HttpPost]
-    public virtual async Task<IActionResult> AddModelAsync(T model)
-        => await ReturnOkIfEverithingIsGood(async () => await service.AddModelAsync(model));
+    public virtual async Task<T> AddModelAsync(T model)
+        => await service.AddModelAsync(model);
 
     [HttpPut]
     public virtual async Task<IActionResult> UpdateModelAsync(T model)

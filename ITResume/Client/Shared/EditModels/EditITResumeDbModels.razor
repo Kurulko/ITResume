@@ -14,4 +14,7 @@
 
     [Parameter]
     public RenderFragment Columns { get; set; } = null!;
+
+    [Parameter]
+    public Func<TModel, TModel>? PrepareModelBeforeSaving { get; set; }
 }

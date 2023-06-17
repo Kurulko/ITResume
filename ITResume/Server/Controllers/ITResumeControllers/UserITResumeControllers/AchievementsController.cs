@@ -8,14 +8,4 @@ namespace ITResume.Server.Controllers.ITResumeControllers.UserITResumeController
 public class AchievementsController : UserITResumeDbModelsController<Achievement>
 {
     public AchievementsController(IAchievementService service, IUserService userService) : base(service, userService) { }
-
-    protected override Achievement? ReturnModelWithoutCycles(Achievement? model)
-    {
-        if (model is not null && model.User is not null)
-        {
-            model.User!.Achievements = null;
-            return model;
-        }
-        return model;
-    }
 }

@@ -1,4 +1,4 @@
-﻿using ITResume.Shared.Models.Database.ITResumeModels;
+﻿using ITResume.Shared.Models.Database.ITResumeModels.UniqueNameModels;
 
 namespace ITResume.Client.Extensions;
 

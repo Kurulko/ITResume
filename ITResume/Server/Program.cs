@@ -1,16 +1,18 @@
 using ITResume.Server.Database;
 using ITResume.Server.Initializers;
 using ITResume.Server.Managers.AccountManagers;
-using ITResume.Server.Managers.ITResumeManagers;
+using ITResume.Server.Managers.ITResumeManagers.IUniqueNameManagers;
 using ITResume.Server.Managers.ITResumeManagers.UserITResumeManager;
+using ITResume.Server.Managers.ITResumeManagers.UserITResumeManagers.SkillUserITResumeManagers;
 using ITResume.Shared.Models.Database;
 using ITResume.Shared.Services;
 using ITResume.Shared.Services.Account;
-using ITResume.Shared.Services.ITResumeServices;
+using ITResume.Shared.Services.ITResumeServices.UniqueNameServices;
 using ITResume.Shared.Services.ITResumeServices.UserServices;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -18,7 +20,7 @@ ConfigurationManager config = builder.Configuration;
 
 IServiceCollection services = builder.Services;
 
-string connection = config.GetConnectionString("DefaultConnection");
+string connection = config.GetConnectionString("DefaultConnection")!;
 services.AddDbContext<ITResumeContext>(opts =>
 {
     opts.UseSqlServer(connection);
@@ -55,7 +57,7 @@ services.AddScoped<IAuthService, AuthManager>();
 
 services.AddControllers().AddNewtonsoftJson(options =>
       options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-   );;
+   ); ;
 services.AddSwaggerGen();
 services.AddRazorPages();
 

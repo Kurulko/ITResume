@@ -1,60 +1,114 @@
 ﻿@page "/experience"
 @inherits _UserLayout
 
-<CascadingValue Value="10" Name="PageSize">
-    <ComplexEditUserITResumeDbModels Service="EmployeeService" TModel="Employee" Context="employee" GetModels="@(us => us.GetUserEmployeesAsync())">
-        <Columns>
-            <GridColumn Field=@nameof(Employee.StartWorking) />
-            <GridColumn Field=@nameof(Employee.FinishWorking) />
-            <GridColumn Field=@nameof(Employee.Salary) />
-            <GridColumn Field=@nameof(Employee.CompanyId) HeaderText="Company">
-                <Template>
-                    @(((Employee)context)!.Company?.Name ?? "no name")
-                </Template>
-                <EditTemplate>
-                    <span>Company</span>
-                    <SfDropDownList TItem="Company" TValue="long" DataSource="@allCompanies"
-                                    @bind-Value="@((context as Employee)!.CompanyId)">
-                        <DropDownListFieldSettings Text="Name" Value="Id" />
-                    </SfDropDownList>
-                </EditTemplate>
-            </GridColumn>
-            <GridColumn Field=@nameof(Project.ProgrammingLanguages) HeaderText="Languages">
-                <Template>
-                    @StringExtensions.ToString((context as Project)!.ProgrammingLanguages)
-                </Template>
-                <EditTemplate>
-                    @{
-                        Project project = context as Project ?? new();
-                    }
-                    @*<MultiSelect AllItems="allLanguages" Placeholder="Select a language" Title="Programming Languages" TextFieldStr="@nameof(ProgrammingLanguage.Name)"
-                                 SaveAsync="@(languages => Task.FromResult(project.ProgrammingLanguages = languages))" CurrentValues="project.ProgrammingLanguages" />
-                *@</EditTemplate>
-            </GridColumn>
-            <GridColumn Field=@nameof(Project.Technologies) HeaderText="Technologies">
-                <Template>
-                    @StringExtensions.ToString((context as Project)!.Technologies)
-                </Template>
-                <EditTemplate>
-                    @{
-                        Employee employee = context as Employee ?? new();
-                    }
-                    @*<MultiSelect AllItems="allTechnologies" Placeholder="Select a language" Title="Technologies" TextFieldStr="@nameof(Technology.Name)"
-                                 SaveAsync="@(technologies => Task.FromResult(employee.Technologies = technologies))" CurrentValues="employee.Technologies" />
-               *@ </EditTemplate>
-            </GridColumn>
-        </Columns>
-        <RowDetails>
-            <td colspan="4">@employee.Description</td>
-        </RowDetails>
-    </ComplexEditUserITResumeDbModels>
-</CascadingValue>
+@if (isLoading)
+{
+    <Spinner />
+}
+else
+{
+    <ShowError Error="@error">
+        <SfGrid @ref="modelGrid" DataSource="models" Toolbar="@(Enum.GetValues<Enums.EditMode>().Select(em => em.ToString()))" AllowPaging="true"
+            AllowSorting="true" ClipMode="ClipMode.EllipsisWithTooltip">
+            <ComplexEditDbModelsSettings />
+            <GridEvents OnActionBegin="ActionBeginHandler" TValue="Employee" />
+            <GridPageSettings PageSize="50" />
+            <GridColumns>
+                <GridColumn Field=@nameof(Employee.Post) />
+                <GridColumn Field=@nameof(Employee.StartWorking) />
+                <GridColumn Field=@nameof(Employee.FinishWorking) />
+                <GridColumn Field=@nameof(Employee.Salary) />
+                <GridColumn Field=@nameof(Employee.Description)>
+                    <EditTemplate>
+                        <span>Description</span>
+                        <SfTextBox @bind-Value="(context as Employee)!.Description" Multiline=true />
+                    </EditTemplate>
+                </GridColumn>
+                <GridColumn Field="Company.Name" HeaderText="Company">
+                    <Template>
+                        @(((Employee)context)!.Company?.Name ?? string.Empty)
+                    </Template>
+                    <EditTemplate>
+                        @{
+                            Employee employee = context as Employee ?? new();
+                            async Task CompanyChanged(string? companyName)
+                            {
+                                employee.Company = companyName is not null ?
+                                await CompanyService.GetModelByUniqueNameAsync(companyName)
+                                : default;
+                            }
+                        }
+                        <span>Company</span>
+                        <SfTextBox @bind-Value="employee.Company!.Name" />
+                        <center>or</center>
+                        <Select AllItems="allCompaniesStr" CurrentValue="@employee.Company!.Name" CurrentValueChanged="CompanyChanged" Placeholder="Company" />
+                    </EditTemplate>
+                </GridColumn>
+                <GridColumn Field=@nameof(Employee.ProgrammingLanguages) HeaderText="Languages" AllowGrouping="false" AllowSorting="false">
+                    <Template>
+                        @StringExtensions.ToString((context as Employee)!.ProgrammingLanguages)
+                    </Template>
+                    <EditTemplate>
+                        @{
+                            Employee employee = context as Employee ?? new();
+                            List<string>? programmingLanguagesStr = employee.ProgrammingLanguages?.Select(p => p.Name).ToList();
+                            async Task ProgrammingLanguagesChanged(IEnumerable<string>? programmingLanguagesStr)
+                            {
+                                employee.ProgrammingLanguages = programmingLanguagesStr is not null ?
+                                allLanguages!.Where(pl => programmingLanguagesStr.Contains(pl.Name))
+                                : default;
+                            }
+                        }
+                        <MultiSelect AllItems="allLanguagesStr" CurrentValues="programmingLanguagesStr" CurrentValuesChanged="ProgrammingLanguagesChanged"
+                                 Placeholder="Languages" Title="Languages" />
+                    </EditTemplate>
+                </GridColumn>
+                <GridColumn Field=@nameof(Employee.Technologies) HeaderText="Technologies" AllowGrouping="false" AllowSorting="false">
+                    <Template>
+                        @StringExtensions.ToString((context as Employee)!.Technologies)
+                    </Template>
+                    <EditTemplate>
+                        @{
+                            Employee employee = context as Employee ?? new();
+                            List<string>? technologiesStr = employee.Technologies?.Select(p => p.Name).ToList();
+                            void TechnologiesChanged(IEnumerable<string>? technologiesStr)
+                            {
+                                employee.Technologies = technologiesStr is not null ?
+                                allTechnologies!.Where(pl => technologiesStr.Contains(pl.Name))
+                                : default;
+                            }
+                        }
+                        <MultiSelect AllItems="allTechnologiesStr" CurrentValues="technologiesStr" CurrentValuesChanged="TechnologiesChanged"
+                                 Placeholder="Technologies" Title="Technologies" />
+                    </EditTemplate>
+                </GridColumn>
+            </GridColumns>
+            <GridTemplates>
+                <DetailTemplate>
+                    <DetailTable>
+                        @((context as Employee)!.Description)
+                    </DetailTable>
+                </DetailTemplate>
+            </GridTemplates>
+        </SfGrid>
+    </ShowError>
+}
 
 
 @code {
+    string? error;
+    SfGrid<Employee> modelGrid = null!;
+
     IEnumerable<ProgrammingLanguage>? allLanguages;
+    IEnumerable<string>? allLanguagesStr;
+
     IEnumerable<Technology>? allTechnologies;
+    IEnumerable<string>? allTechnologiesStr;
+
     IEnumerable<Company>? allCompanies;
+    IEnumerable<string>? allCompaniesStr;
+
+    IEnumerable<Employee>? models;
 
     [Inject]
     public IEmployeeService EmployeeService { get; set; } = null!;
@@ -69,16 +123,78 @@
     public ICompanyService CompanyService { get; set; } = null!;
 
 
-    string DisplayProgrammingLanguages(object context)
-        => string.Join(",", (context as IEnumerable<ProgrammingLanguage>)?.Select(pl => pl.Name) ?? Enumerable.Empty<string>());
-
-    string DisplayTechnologies(object context)
-        => string.Join(",", (context as IEnumerable<Technology>)?.Select(pl => pl.Name) ?? Enumerable.Empty<string>());
-
+    bool isLoading = true;
     protected override async Task OnInitializedAsync()
     {
+        await SetModels();
+
         allLanguages = await ProgrammingLanguageService.GetAllModelsAsync();
+        allLanguagesStr = allLanguages.Select(c => c.Name);
+
         allTechnologies = await TechnologyService.GetAllModelsAsync();
+        allTechnologiesStr = allTechnologies.Select(c => c.Name);
+
+        isLoading = false;
+    }
+
+    public async void ActionBeginHandler(ActionEventArgs<Employee> Args)
+    {
+        try
+        {
+            Employee? employee = Args.Data;
+
+            if (Args.RequestType == Syncfusion.Blazor.Grids.Action.Save)
+            {
+                string? companyName = employee.Company!.Name;
+                long companyId = employee.Company!.Id;
+                employee.Company = null;
+
+                if (companyName is not null)
+                {
+                    if (companyId == 0)
+                    {
+                        Company? company = await CompanyService.GetModelByUniqueNameAsync(companyName);
+
+                        if (company is null || company is { })
+                            company = await CompanyService.AddModelAsync(new() { Name = companyName });
+
+                        employee.CompanyId = company!.Id;
+                    }
+                    else
+                        employee.CompanyId = companyId;
+                }
+
+
+                if (Args.Action == Enums.EditMode.Add.ToString())
+                    await EmployeeService.AddModelAsync(employee);
+                else
+                    await EmployeeService.UpdateModelAsync(employee);
+
+                await Refresh();
+            }
+            else if (Args.RequestType == Syncfusion.Blazor.Grids.Action.Delete)
+            {
+                await EmployeeService.DeleteModelAsync(employee!.Id);
+                await Refresh();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("ERROR: " + ex);
+            error = ex.Message;
+        }
+    }
+
+    async Task Refresh()
+    {
+        await SetModels();
+        await modelGrid.Refresh();
+    }
+
+    async Task SetModels()
+    {
+        models = await UserService.GetUserEmployeesAsync();
         allCompanies = await CompanyService.GetAllModelsAsync();
+        allCompaniesStr = allCompanies.Select(c => c.Name);
     }
 }

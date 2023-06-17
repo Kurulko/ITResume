@@ -4,7 +4,7 @@ public enum EditMode
 {
     Add,
     Edit,
-    Update, 
+    Update,
     Delete,
     Cancel
 }

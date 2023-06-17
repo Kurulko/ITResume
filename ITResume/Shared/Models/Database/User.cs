@@ -1,6 +1,7 @@
 ﻿using ITResume.Shared.Enums;
-using ITResume.Shared.Models.Database.ITResumeModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UniqueNameModels;
 using ITResume.Shared.Models.Database.ITResumeModels.UserModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UserModels.SkillUserModels;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;

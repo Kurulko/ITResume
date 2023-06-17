@@ -2,6 +2,7 @@
 @using ITResume.Client.Parser;
 @inherits _UserLayout
 
+<DisplayNameEdit Name="@nameof(Contact)" />
 @if (contact is null)
 {
     <Spinner />
@@ -60,6 +61,14 @@ else
             <ValidationMessage For="@(() => contact.Telegram)" />
         </div>
         <br />
+        <div class="form-group">
+            <label>From</label>
+            <SfDropDownList TItem="Country" TValue="long?" DataSource="@countries"
+                        @bind-Value="@(contact.CountryId)" AllowFiltering=true Placeholder="Countries">
+                <DropDownListFieldSettings Text="Name" Value="Id" />
+            </SfDropDownList>
+        </div>
+        <br />
     </SimpleForm>
 }
 
@@ -74,10 +83,20 @@ else
     public IContactService ContactService { get; set; } = null!;
 
     [Inject]
+    public ICountryService CountryService { get; set; } = null!;
+
+    [Inject]
     public IProjectService ProjectService { get; set; } = null!;
 
+    [Inject]
+    public IProgrammingLanguageService ProgrammingLanguageService { get; set; } = null!;
+
+    IEnumerable<Country>? countries;
     protected override async Task OnInitializedAsync()
-        => contact = await UserService.GetUserContactAsync();
+    {
+        contact = await UserService.GetUserContactAsync();
+        countries = await CountryService.GetAllModelsAsync();
+    }
 
     async Task Action()
     {
@@ -96,7 +115,30 @@ else
 
             var projects = githubParser.Projects;
             if (projects.IsCountOverZero())
-                await ProjectService.UpdateModelsAsync(projects);
+            {
+                foreach (Project project in projects)
+                {
+                    var languages = project!.ProgrammingLanguages;
+                    project.ProgrammingLanguages = null;
+
+                    long projectId = (await ProjectService.AddModelAsync(project)).Id;
+
+                    if (languages is not null)
+                    {
+                        foreach (ProgrammingLanguage language in languages)
+                        {
+                            Console.WriteLine(language.Name);
+                            var _language = await ProgrammingLanguageService.GetModelByUniqueNameAsync(language.Name);
+
+                            //if (_language is null)
+                            //    _language = await ProgrammingLanguageService.AddModelAsync(language);
+
+                            if (_language is not null)
+                                await ProjectService.AddProgrammingLanguageToModel(projectId, _language.Id);
+                        }
+                    }
+                }
+            }
         }
     }
 

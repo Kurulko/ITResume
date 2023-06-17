@@ -24,9 +24,7 @@ else
                     </DetailTemplate>
                 </GridTemplates>
             }
-            <GridSortSettings AllowUnsort="false" />
-            <GridEditSettings Mode="Syncfusion.Blazor.Grids.EditMode.Dialog" AllowAdding="true"
-                          AllowEditing="true" AllowDeleting="true" HeaderTemplate="HeaderTemplate!" />
+            <ComplexEditDbModelsSettings />
             <GridEvents OnActionBegin="ActionBeginHandler" TValue="TModel" />
             <GridPageSettings PageSize="PageSize" />
             @ChildContent

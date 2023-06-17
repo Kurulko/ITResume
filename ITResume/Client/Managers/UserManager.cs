@@ -1,7 +1,8 @@
 ﻿using ITResume.Client.Managers.ITResumeManagers;
 using ITResume.Shared.Models.Account;
-using ITResume.Shared.Models.Database.ITResumeModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UniqueNameModels;
 using ITResume.Shared.Models.Database.ITResumeModels.UserModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UserModels.SkillUserModels;
 using ITResume.Shared.Models.ViewModels;
 using ITResume.Shared.Services;
 using ITResume.Shared.Services.ITResumeServices;
@@ -19,7 +20,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using Project = ITResume.Shared.Models.Database.ITResumeModels.UserModels.Project;
+using Project = ITResume.Shared.Models.Database.ITResumeModels.UserModels.SkillUserModels.Project;
 using User = ITResume.Shared.Models.Database.User;
 
 namespace ITResume.Client.Managers;
@@ -70,7 +71,7 @@ public class UserManager : DbModelManager<User, string>, IUserService
     public async Task ChangeUserPasswordAsync(ChangePassword model)
         => await CheckResponseMessage(await httpClient.PutAsJsonAsync($"{url}/password", model));
 
-    public async Task AddUserPasswordAsync(ModelWithUserId<ChangePassword> model)
+    public async Task AddUserPasswordAsync(ModelWithUserId<string> model)
         => await CheckResponseMessage(await httpClient.PostAsJsonAsync($"{url}/password", model));
 
     public async Task<bool> HasUserPasswordAsync(string userId)
@@ -82,6 +83,6 @@ public class UserManager : DbModelManager<User, string>, IUserService
     public async Task AddRoleToUserAsync(ModelWithUserId<string> model)
         => await CheckResponseMessage(await httpClient.PostAsJsonAsync($"{url}/{model.UserId}/role", model.Model));
 
-    public async Task DeleteRoleFromUserAsync(string userId, string roleName)
-        => await CheckResponseMessage(await httpClient.DeleteAsync($"{url}/{userId}/{roleName}"));
+    public async Task DeleteRoleFromUserAsync(ModelWithUserId<string> model)
+        => await CheckResponseMessage(await httpClient.DeleteAsync($"{url}/{model.UserId}/{model.Model}"));
 }

@@ -1,4 +1,4 @@
-﻿using ITResume.Shared.Models.Database.ITResumeModels;
+﻿using ITResume.Shared.Models.Database.ITResumeModels.UniqueNameModels;
 using Newtonsoft.Json;
 using System.Globalization;
 using System.Net.Http;
@@ -19,7 +19,7 @@ public class CountriesInitializer
             countriesStr.Add(region.EnglishName);
         }
 
-        IEnumerable<Country> countries = countriesStr.Select(countryStr => new Country() { Name = countryStr });
+        IEnumerable<Country> countries = countriesStr.Distinct().Select(countryStr => new Country() { Name = countryStr });
         return countries;
     }
 }

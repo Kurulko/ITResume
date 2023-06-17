@@ -1,8 +1,6 @@
 using ITResume.Client;
 using ITResume.Client.Managers;
-using ITResume.Client.Managers.ITResumeServices;
 using ITResume.Shared.Services;
-using ITResume.Shared.Services.ITResumeServices;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -15,6 +13,9 @@ using ITResume.Client.Managers.AccountManagers;
 using ITResume.Shared.Services.Account;
 using ITResume.Shared.Services.ITResumeServices.UserServices;
 using ITResume.Client.Managers.ITResumeManagers.UserITResumeManagers;
+using ITResume.Client.Managers.ITResumeManagers.UserITResumeManagers.SkillITResumeDbModelManager;
+using ITResume.Shared.Services.ITResumeServices.UniqueNameServices;
+using ITResume.Client.Managers.ITResumeManagers.UniqueNameServices;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");

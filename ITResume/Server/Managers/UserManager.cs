@@ -1,13 +1,15 @@
 ﻿using ITResume.Server.Database;
 using ITResume.Shared.Models.Account;
 using ITResume.Shared.Models.Database;
-using ITResume.Shared.Models.Database.ITResumeModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UniqueNameModels;
 using ITResume.Shared.Models.Database.ITResumeModels.UserModels;
+using ITResume.Shared.Models.Database.ITResumeModels.UserModels.SkillUserModels;
 using ITResume.Shared.Models.ViewModels;
 using ITResume.Shared.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
@@ -22,18 +24,17 @@ namespace ITResume.Server.Managers;
 public class UserManager : IUserService
 {
     readonly UserManager<User> userManager;
-    readonly ITResumeContext db;
     readonly IHttpContextAccessor httpContextAccessor;
     public UserManager(UserManager<User> userManager, ITResumeContext db, IHttpContextAccessor httpContextAccessor)
     {
-        (this.userManager, this.db, this.httpContextAccessor) = (userManager, db, httpContextAccessor);
+        (this.userManager, this.httpContextAccessor) = (userManager, httpContextAccessor);
         getModels = db.Users;
     }
 
-    public async Task AddModelAsync(User model)
+    public async Task<User> AddModelAsync(User model)
     {
-        await db.Users.AddAsync(model);
-        db.SaveChanges();
+        await userManager.CreateAsync(model);
+        return model;
     }
 
     public async Task ChangeUsedUserIdAsync(string userId, string usedUserId)
@@ -73,10 +74,7 @@ public class UserManager : IUserService
 
 
     public async Task<User?> GetModelByIdAsync(string key)
-    {
-        getModels = getModels.Include(u => u.UserDetails);
-        return await getModels.FirstOrDefaultAsync(u => u.Id == key);
-    }
+        => await getModels.Include(u => u.UserDetails).FirstOrDefaultAsync(u => u.Id == key);
 
     public async Task<User?> GetUserByClaimsAsync(ClaimsPrincipal claims)
         => await GetModelByIdAsync(claims.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -162,12 +160,11 @@ public class UserManager : IUserService
             throw new Exception(string.Join("; ", res.Errors.Select(e => e.Description)));
     }
 
-    public async Task AddUserPasswordAsync(ModelWithUserId<ChangePassword> model)
+    public async Task AddUserPasswordAsync(ModelWithUserId<string> model)
     {
-
-        ChangePassword password = model.Model;
+        string newPassword = model.Model;
         User user = await GetUserByIdAsync(model.UserId);
-        IdentityResult res = await userManager.AddPasswordAsync(user, password.NewPassword);
+        IdentityResult res = await userManager.AddPasswordAsync(user, newPassword);
         if (!res.Succeeded)
             throw new Exception(string.Join("; ", res.Errors.Select(e => e.Description)));
     }
@@ -181,10 +178,10 @@ public class UserManager : IUserService
             throw new Exception(string.Join("; ", res.Errors.Select(e => e.Description)));
     }
 
-    public async Task DeleteRoleFromUserAsync(string userId, string roleName)
+    public async Task DeleteRoleFromUserAsync(ModelWithUserId<string> model)
     {
-        User user = await GetUserByIdAsync(userId);
-        IdentityResult res = await userManager.RemoveFromRoleAsync(user, roleName);
+        User user = await GetUserByIdAsync(model.UserId);
+        IdentityResult res = await userManager.RemoveFromRoleAsync(user, model.Model);
         if (!res.Succeeded)
             throw new Exception(string.Join("; ", res.Errors.Select(e => e.Description)));
     }

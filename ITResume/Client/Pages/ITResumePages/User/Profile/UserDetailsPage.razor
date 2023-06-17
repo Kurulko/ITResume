@@ -2,10 +2,7 @@
 @page "/me"
 @inherits _UserLayout
 
-<h3>User</h3>
-<hr />
-<h3>Details</h3>
-<br />
+<DisplayNameDetails Name="@nameof(User)" />
 @if (user is null)
 {
     <Spinner />
@@ -96,10 +93,6 @@ else
         <div class="col-md-4">
             <NavLink href="user/edit" class="btn btn-warning">Edit Profile</NavLink><br /><br />
             <NavLink href="user/edit-password" class="btn btn-warning">Edit Password</NavLink><br /><br />
-            @if (isAdmin)
-            {
-                <NavLink href="@($"users/{user.Id}/edit-roles")" class="btn btn-warning">Edit Roles</NavLink>
-            }
             <br />
             <br />
         </div>

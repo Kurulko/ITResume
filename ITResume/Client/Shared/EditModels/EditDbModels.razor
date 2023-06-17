@@ -35,6 +35,9 @@
     [Parameter]
     public Func<Task<IEnumerable<TModel>>>? GetModels { get; set; }
 
+    [Parameter]
+    public Func<TModel, TModel>? PrepareModelBeforeSaving { get; set; }
+
     protected override async Task OnParametersSetAsync()
     {
         try
@@ -54,6 +57,9 @@
         try
         {
             TModel model = Args.Data;
+            
+            if (PrepareModelBeforeSaving is not null)
+                model = PrepareModelBeforeSaving(model);
 
             if (Args.RequestType == Syncfusion.Blazor.Grids.Action.Save)
             {

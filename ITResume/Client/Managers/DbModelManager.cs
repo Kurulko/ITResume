@@ -1,5 +1,6 @@
 ﻿using ITResume.Shared.Models.Database;
 using ITResume.Shared.Services;
+using Newtonsoft.Json;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -18,8 +19,12 @@ public abstract class DbModelManager<T, K> : APIManager, IDbModelService<T, K> w
     public virtual async Task UpdateModelAsync(T model)
         => await CheckResponseMessage(await httpClient.PutAsJsonAsync(url, model));
 
-    public virtual async Task AddModelAsync(T model)
-        => await CheckResponseMessage(await httpClient.PostAsJsonAsync(url, model));
+    public virtual async Task<T> AddModelAsync(T model)
+    {
+        var response = await httpClient.PostAsJsonAsync(url, model);
+        await CheckResponseMessage(response);
+        return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync())!;
+    }
 
     public virtual async Task DeleteModelAsync(K key)
         => await CheckResponseMessage(await httpClient.DeleteAsync($"{url}/{key}"));

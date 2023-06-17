@@ -1,32 +1,54 @@
 ﻿@page "/foreign-languages"
 @inherits _UserLayout
 
-<CascadingValue Value="10" Name="PageSize">
-    <SimpleEditUserITResumeDbModels Service="ForeignLanguageService" TModel="ForeignLanguage" GetModels="@(us => us.GetUserForeignLanguagesAsync())">
-        <Columns>
-            <GridColumn Field=@nameof(ForeignLanguage.HumanLanguageId) HeaderText="Name">
-                <Template>
-                    @(((ForeignLanguage)context)!.HumanLanguage?.Name ?? "no name")
-                </Template>
-                <EditTemplate>
-                    <SfDropDownList TItem="HumanLanguage" TValue="long" DataSource="@humanLanguages"
-                                    @bind-Value="@((context as ForeignLanguage)!.HumanLanguageId)">
-                        <DropDownListFieldSettings Text="Name" Value="Id" />
-                    </SfDropDownList>
-                </EditTemplate>
-            </GridColumn>
-            <GridColumn Field=@nameof(ForeignLanguage.LanguageLevel)>
-                <EditTemplate>
-                    <SfDropDownList ID="LanguageLevel" TItem="string" TValue="LanguageLevel"
-                                    @bind-Value="@((context as ForeignLanguage)!.LanguageLevel)"
-                                    DataSource="@languageLevelEnumValues" />
-                </EditTemplate>
-            </GridColumn>
-        </Columns>
-    </SimpleEditUserITResumeDbModels>
-</CascadingValue>
+@if (isLoading)
+{
+    <Spinner />
+}
+else
+{
+    <center>
+        <ShowError Error="@error">
+            <SfGrid @ref="modelGrid" DataSource="models" Toolbar="@(Enum.GetValues<Enums.EditMode>().Select(em => em.ToString()))" AllowPaging="true"
+                AllowSorting="true" ClipMode="ClipMode.EllipsisWithTooltip" Width="50%">
+                <SimpleEditDbModelsSettings />
+                <GridEvents OnActionBegin="ActionBeginHandler" TValue="ForeignLanguage" />
+                <GridPageSettings PageSize="50" />
+                <GridColumns>
+                    <GridColumn Field=@nameof(ForeignLanguage.HumanLanguageId) HeaderText="Name">
+                        <Template>
+                            @(((ForeignLanguage)context)!.HumanLanguage?.Name)
+                        </Template>
+                        <EditTemplate>
+                            @{
+                                ForeignLanguage language = (context as ForeignLanguage)!;
+                                async Task HumanLanguageChanged(string? humanLanguageName)
+                                {
+                                    if (!string.IsNullOrEmpty(humanLanguageName))
+                                        language.HumanLanguageId = (await HumanLanguageService.GetModelByUniqueNameAsync(humanLanguageName))!.Id;
+                                }
+                            }
+                            <Select AllItems="humanLanguagesStr" CurrentValue="@language.HumanLanguage?.Name" CurrentValueChanged="HumanLanguageChanged"
+                                Placeholder="Language" />
+                        </EditTemplate>
+                    </GridColumn>
+                    <GridColumn Field=@nameof(ForeignLanguage.LanguageLevel)>
+                        <EditTemplate>
+                            <SfDropDownList ID="LanguageLevel" TItem="string" TValue="LanguageLevel"
+                                        @bind-Value="@((context as ForeignLanguage)!.LanguageLevel)"
+                                        DataSource="@languageLevelEnumValues" />
+                        </EditTemplate>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        </ShowError>
+    </center>
+}
 
 @code {
+    string? error;
+    SfGrid<ForeignLanguage> modelGrid = null!;
+
     string[] languageLevelEnumValues = Enum.GetNames<LanguageLevel>();
 
     [Inject]
@@ -36,6 +58,56 @@
     public IHumanLanguageService HumanLanguageService { get; set; } = null!;
 
     IEnumerable<HumanLanguage>? humanLanguages;
+    IEnumerable<string>? humanLanguagesStr;
+
+    IEnumerable<ForeignLanguage>? models;
+
+    bool isLoading = true;
     protected override async Task OnInitializedAsync()
-        => humanLanguages = await HumanLanguageService.GetAllModelsAsync();
+    {
+        await SetModels();
+
+        humanLanguages = await HumanLanguageService.GetAllModelsAsync();
+        humanLanguagesStr = humanLanguages.Select(c => c.Name);
+
+        isLoading = false;
+    }
+
+    public async void ActionBeginHandler(ActionEventArgs<ForeignLanguage> Args)
+    {
+        try
+        {
+            ForeignLanguage? foreignLanguage = Args.Data;
+
+            if (Args.RequestType == Syncfusion.Blazor.Grids.Action.Save)
+            {
+                if (Args.Action == Enums.EditMode.Add.ToString())
+                    await ForeignLanguageService.AddModelAsync(foreignLanguage);
+                else
+                    await ForeignLanguageService.UpdateModelAsync(foreignLanguage);
+
+                await Refresh();
+            }
+            else if (Args.RequestType == Syncfusion.Blazor.Grids.Action.Delete)
+            {
+                await ForeignLanguageService.DeleteModelAsync(foreignLanguage!.Id);
+                await Refresh();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("ERROR: " + ex);
+            error = ex.Message;
+        }
+    }
+
+    async Task Refresh()
+    {
+        await SetModels();
+        await modelGrid.Refresh();
+    }
+
+    async Task SetModels()
+        => models = await UserService.GetUserForeignLanguagesAsync();
+
 }

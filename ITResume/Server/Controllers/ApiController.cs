@@ -16,7 +16,8 @@ public class ApiController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            var innerEx = ex.InnerException;
+            return BadRequest((innerEx is null ? ex : innerEx).Message);
         }
     }
 }

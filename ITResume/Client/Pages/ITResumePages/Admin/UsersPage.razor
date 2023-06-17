@@ -1,71 +1,102 @@
 ﻿@page "/users"
 @inherits _AdminLayout
 
-@if (usersRoles is not null)
+@if (isLoading)
 {
-    <CascadingValue Value="30" Name="PageSize">
-        <ComplexEditDbModels Service="UserService" TModel="User" TKey="string" Context="user">
-            <ChildContent>
-                <GridEvents CommandClicked="OnCommandClicked" TValue="User" />
-                <GridColumns>
-                    <GridColumn Field=@nameof(User.Id) IsPrimaryKey="true" AllowAdding="false" />
-                    <GridColumn Field=@nameof(User.UserName) />
-                    <GridColumn Field=@nameof(User.FirstName) />
-                    <GridColumn Field=@nameof(User.LastName) />
-                    <GridColumn Field=@nameof(User.FatherName) />
-                    <GridColumn Field=@nameof(User.Email) />
-                    <GridColumn Field=@nameof(User.Birthday) />
-                    <GridColumn Field=@nameof(User.Registered) />
-                    <GridColumn HeaderText="Roles" AllowAdding=false>
-                        <Template>
-                            @string.Join(",", usersRoles[((User)context)!.Id])
-                        </Template>
-                        <EditTemplate>
-                            @{
-                                User user = (context as User)!;
+    <Spinner />
+}
+else
+{
+    <ShowError Error="@error">
+        <SfGrid @ref="modelGrid" DataSource="models" Toolbar="@(Enum.GetValues<Enums.EditMode>().Select(em => em.ToString()))" AllowPaging="true"
+            AllowSorting="true" ClipMode="ClipMode.EllipsisWithTooltip">
+            <ComplexEditDbModelsSettings />
+            <GridEvents CommandClicked="OnCommandClicked" OnActionBegin="ActionBeginHandler" TValue="User" />
+            <GridPageSettings PageSize="50" />
+            <GridColumns>
+                <GridColumn Field=@nameof(User.Id) IsPrimaryKey="true" AllowAdding="false" AllowEditing="false" />
+                <GridColumn Field=@nameof(User.UserName) AllowEditing="false" />
+                <GridColumn Field=@nameof(User.FirstName) AllowEditing="false" />
+                <GridColumn Field=@nameof(User.LastName) AllowEditing="false"/>
+                <GridColumn Field=@nameof(User.FatherName) AllowEditing="false"/>
+                <GridColumn Field=@nameof(User.Email) AllowEditing="false"/>
+                <GridColumn Field=@nameof(User.Birthday) AllowEditing="false"/>
+                <GridColumn Field=@nameof(User.Registered) AllowEditing="false" />
+                <GridColumn HeaderText="Roles" AllowAdding=false>
+                    <Template>
+                        @{
+                            usersRoles!.TryGetValue(((User)context)!.Id, out List<string>? roles);
+                        }
+                        @if (roles is not null)
+                        {
+                            @string.Join(",", roles)
+                        }
+                    </Template>
+                    <EditTemplate>
+                        @{
+                            User user = (context as User)!;
 
-                                async Task HandleRoleSelection(IEnumerable<string> selectedValues)
+                            string password = string.Empty;
+
+                            usersRoles!.TryGetValue(((User)context)!.Id, out List<string>? roles);
+
+                            async Task HandleRoleSelection(IEnumerable<string> selectedValues)
+                            {
+                                if (selectedValues is not null)
                                 {
-                                    Console.WriteLine($"NULL?:{selectedValues is null}");
+                                    foreach (var newRole in selectedValues.Except(roles))
+                                        await UserService.AddRoleToUserAsync(new(user.Id, newRole));
 
-                                    if (selectedValues is not null)
-                                    {
-                                        var roles = selectedValues;
-                                        Console.WriteLine(string.Join(",", roles));
+                                    foreach (var oldRole in roles.Except(selectedValues))
+                                        await UserService.DeleteRoleFromUserAsync(new(user.Id, oldRole));
 
-                                        foreach (var newRole in roles.Except(usersRoles[user.Id]))
-                                            await UserService.AddRoleToUserAsync(new(user.Id, newRole));
-
-                                        foreach (var oldRole in usersRoles[user.Id].Except(roles))
-                                            await UserService.AddRoleToUserAsync(new(user.Id, oldRole));
-
-
-                                        StateHasChanged();
-                                    }
+                                    await SetUserRoles();
                                 }
                             }
-                            <span>Roles</span>
-                            <SfMultiSelect TValue="IEnumerable<string>" TItem="string" Placeholder="Select a role" DataSource="@allRoles"
-                                       Mode="VisualMode.CheckBox" Value="usersRoles[user.Id]" ValueChanged="HandleRoleSelection" />
-                        </EditTemplate>
 
-                    </GridColumn>
-                    <GridColumn>
-                        <GridCommandColumns>
-                            <GridCommandColumn ButtonOption="@(new CommandButtonOptions() {
+                            async Task HandlePasswordSelection(string? password)
+                            {
+                                if (password is not null)
+                                    await UserService.AddUserPasswordAsync(new(user.Id, password));
+                            }
+                        }
+                        @if (roles is not null)
+                        {
+                            <MultiSelect AllItems="allRoles" CurrentValues="roles" CurrentValuesChanged="HandleRoleSelection"
+                                 Placeholder="Roles" Title="Roles" />
+
+                            @if (!HasUserPassword(user))
+                            {
+                                <br />
+
+                                <br />
+                                <span>Password</span>
+                                <SfTextBox Value="@password" ValueChanged="HandlePasswordSelection" Type="InputType.Password" Placeholder="Password" />
+                            }
+                        }
+                    </EditTemplate>
+                </GridColumn>
+                <GridColumn>
+                    <GridCommandColumns>
+                        <GridCommandColumn ButtonOption="@(new CommandButtonOptions() {
                             Content = "Impersonate", CssClass = "e-outline" })" />
-                        </GridCommandColumns>
-                    </GridColumn>
-                </GridColumns>
-            </ChildContent>
-            <HeaderTemplate>
-                @GetDialogHeader((user as User)!)
-            </HeaderTemplate>
-        </ComplexEditDbModels>
-    </CascadingValue>
+                    </GridCommandColumns>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </ShowError>
 }
 
 @code {
+
+    string? error;
+    SfGrid<User> modelGrid = null!;
+
+    IEnumerable<string>? allRoles;
+    Dictionary<string, List<string>>? usersRoles;
+
+    IEnumerable<User>? models;
+
     [Inject]
     public IUserService UserService { get; set; } = null!;
 
@@ -90,21 +121,72 @@
     string GetDialogHeader(User user)
         => string.IsNullOrEmpty(user.Id) ? "Add New User" : $"Edit {user.UserName} Details";
 
-    IEnumerable<string>? allRoles;
-    Dictionary<string, IEnumerable<string>>? usersRoles;
+
+    bool isLoading = true;
     protected override async Task OnInitializedAsync()
     {
-        allRoles = (await RoleService.GetAllModelsAsync()).Select(r => r.Name);
-        var urs = (await UserService.GetAllModelsAsync())
-            .Select(async u => new KeyValuePair<string, IEnumerable<string>>(u.Id, await UserService.GetRolesAsync(u.Id)));
+        await SetModels();
+        isLoading = false;
+    }
 
-        List<KeyValuePair<string, IEnumerable<string>>> ursList = new();
+    public async void ActionBeginHandler(ActionEventArgs<User> args)
+    {
+        try
+        {
+            User? user = args.Data;
+
+            if (args.RequestType == Syncfusion.Blazor.Grids.Action.Save)
+            {
+                if (args.Action == Enums.EditMode.Add.ToString())
+                    await UserService.AddModelAsync(user);
+
+                //else if (args.Action == Enums.EditMode.Edit.ToString())
+                //    await UserService.UpdateModelAsync(user);
+
+                await Refresh();
+            }
+            else if (args.RequestType == Syncfusion.Blazor.Grids.Action.Delete)
+            {
+                await UserService.DeleteModelAsync(user!.Id);
+                await Refresh();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("ERROR: " + ex);
+            error = ex.Message;
+        }
+    }
+
+    async Task Refresh()
+    {
+        await SetModels();
+        await modelGrid.Refresh();
+    }
+
+    async Task SetModels()
+    {
+        models = await UserService.GetAllModelsAsync();
+        allRoles = (await RoleService.GetAllModelsAsync()).Select(r => r.Name);
+        await SetUserRoles();
+
+    }
+
+    async Task SetUserRoles()
+    {
+        var urs = (await UserService.GetAllModelsAsync())
+            .Select(async u => new KeyValuePair<string, List<string>>(u.Id, (await UserService.GetRolesAsync(u.Id)).ToList()));
+
+        List<KeyValuePair<string, List<string>>> ursList = new();
         foreach (var ur in urs)
         {
-            KeyValuePair<string, IEnumerable<string>> urItem = await ur;
+            KeyValuePair<string, List<string>> urItem = await ur;
             ursList.Add(urItem);
         }
 
-        usersRoles = new Dictionary<string, IEnumerable<string>>(ursList);
+        usersRoles = new Dictionary<string, List<string>>(ursList);
     }
+
+    bool HasUserPassword(User user)
+        => !string.IsNullOrEmpty(user.PasswordHash);
 }
