@@ -1,19 +1,19 @@
 ﻿@page "/projects"
-@inherits _UserLayout
+@inherits EditComplexSkillUserITResumeDbModels<Project>
 
 
-@if (isLoading)
+@if (!isDisplay)
 {
     <Spinner />
 }
 else
 {
     <ShowError Error="@error">
-        <SfGrid @ref="modelGrid" DataSource="models" Toolbar="@(Enum.GetValues<Enums.EditMode>().Select(em => em.ToString()))" AllowPaging="true"
-            AllowSorting="true" ClipMode="ClipMode.EllipsisWithTooltip">
+        <SfGrid @ref="modelGrid" DataSource="models" Toolbar="@GetToolbar()" AllowPaging="@isAllowPaging"
+            AllowSorting="isAllowOperationsWithModels" AllowGrouping="isAllowOperationsWithModels" ClipMode="ClipMode.EllipsisWithTooltip">
             <ComplexEditDbModelsSettings />
             <GridEvents OnActionBegin="ActionBeginHandler" TValue="Project" />
-            <GridPageSettings PageSize="50" />
+            <GridPageSettings PageSize="PageSize" />
             <GridColumns>
                 <GridColumn Field=@nameof(Project.Name) />
                 <GridColumn Field=@nameof(Project.Github) />
@@ -33,13 +33,9 @@ else
                     <EditTemplate>
                         @{
                             Project project = context as Project ?? new();
-                            List<string>? programmingLanguagesStr = project.ProgrammingLanguages?.Select(p => p.Name).ToList();
+                            List<string>? programmingLanguagesStr = project.ProgrammingLanguages?.SelectName()?.ToList();
                             async Task ValueChanged(IEnumerable<string>? programmingLanguagesStr)
-                            {
-                                project.ProgrammingLanguages = programmingLanguagesStr is not null ?
-                                allLanguages!.Where(pl => programmingLanguagesStr.Contains(pl.Name))
-                                : default;
-                            }
+                                => project.ProgrammingLanguages = allLanguages!.WhereNameContainsInStrCollection(programmingLanguagesStr);
                         }
                         <MultiSelect AllItems="allLanguagesStr" CurrentValues="programmingLanguagesStr" CurrentValuesChanged="ValueChanged"
                                  Placeholder="Languages" Title="Languages" />
@@ -52,13 +48,9 @@ else
                     <EditTemplate>
                         @{
                             Project project = context as Project ?? new();
-                            List<string>? technologiesStr = project.Technologies?.Select(p => p.Name).ToList();
+                            List<string>? technologiesStr = project.Technologies?.SelectName()?.ToList();
                             async Task ValueChanged(IEnumerable<string>? technologiesStr)
-                            {
-                                project.Technologies = technologiesStr is not null ?
-                                allTechnologies!.Where(pl => technologiesStr.Contains(pl.Name))
-                                : default;
-                            }
+                                => project.Technologies = allTechnologies!.WhereNameContainsInStrCollection(technologiesStr);
                         }
                         <MultiSelect AllItems="allTechnologiesStr" CurrentValues="technologiesStr" CurrentValuesChanged="ValueChanged"
                                  Placeholder="Technologies" Title="Technologies" />
@@ -78,74 +70,11 @@ else
 
 
 @code {
-    string? error;
-    SfGrid<Project> modelGrid = null!;
-
-    IEnumerable<ProgrammingLanguage>? allLanguages;
-    IEnumerable<string>? allLanguagesStr;
-
-    IEnumerable<Technology>? allTechnologies;
-    IEnumerable<string>? allTechnologiesStr;
-
-    IEnumerable<Project>? models;
-
     [Inject]
     public IProjectService ProjectService { get; set; } = null!;
 
-    [Inject]
-    public IProgrammingLanguageService ProgrammingLanguageService { get; set; } = null!;
+    protected override async Task<IEnumerable<Project>> GetModels()
+        => await UserService.GetCurrentUserProjectsAsync();
 
-    [Inject]
-    public ITechnologyService TechnologyService { get; set; } = null!;
-
-    bool isLoading = true;
-    protected override async Task OnInitializedAsync()
-    {
-        await SetModels();
-
-        allLanguages = await ProgrammingLanguageService.GetAllModelsAsync();
-        allLanguagesStr = allLanguages.Select(c => c.Name);
-
-        allTechnologies = await TechnologyService.GetAllModelsAsync();
-        allTechnologiesStr = allTechnologies.Select(c => c.Name);
-
-        isLoading = false;
-    }
-
-    public async void ActionBeginHandler(ActionEventArgs<Project> Args)
-    {
-        try
-        {
-            Project? project = Args.Data;
-
-            if (Args.RequestType == Syncfusion.Blazor.Grids.Action.Save)
-            {
-                if (Args.Action == Enums.EditMode.Add.ToString())
-                    await ProjectService.AddModelAsync(project);
-                else
-                    await ProjectService.UpdateModelAsync(project);
-
-                await Refresh();
-            }
-            else if (Args.RequestType == Syncfusion.Blazor.Grids.Action.Delete)
-            {
-                await ProjectService.DeleteModelAsync(project!.Id);
-                await Refresh();
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("ERROR: " + ex);
-            error = ex.Message;
-        }
-    }
-
-    async Task Refresh()
-    {
-        await SetModels();
-        await modelGrid.Refresh();
-    }
-
-    async Task SetModels()
-        => models = await UserService.GetUserProjectsAsync();
+    protected override IDbModelService<Project, long> Service => ProjectService;
 }

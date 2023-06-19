@@ -3,17 +3,17 @@
 
 <AuthorizeView>
     <Authorized>
-        @if (user is null)
+        @if (!isDisplay)
         {
-            <SfSpinner Visible="true" Type="@SpinnerType.Bootstrap" Size="50" />
+            <Spinner />
         }
         else
         {
-            <NavLink class="btn btn-link" href="/user/details"> Hello, @user.UserName!</NavLink>
+            <NavLink class="btn btn-link" href="/user/details"> Hello, @userName!</NavLink>
             <button class="btn btn-link" @onclick="LogoutClick">Logout</button>
-            @if (!string.IsNullOrEmpty(user?.UsedUserId))
+            @if (isImpersonating)
             {
-                <button class="btn btn-link" @onclick="FinishImpersonating">Finish Impersonating</button>
+                <button class="btn btn-warning" @onclick="FinishImpersonating">Finish Impersonating</button>
             }
         }
     </Authorized>
@@ -31,11 +31,10 @@
     public CustomStateProvider Auth { get; set; } = null!;
 
     [Inject]
-    public IUserService IUser { get; set; } = null!;
+    public IUserService UserService { get; set; } = null!;
 
     [CascadingParameter]
     Task<AuthenticationState> AuthStateTask { get; set; } = null!;
-
 
     async Task LogoutClick()
     {
@@ -45,17 +44,29 @@
 
     async Task FinishImpersonating()
     {
-        await IUser.DropUsedUserIdAsync(user.Id);
-        user.UsedUserId = null;
+        await UserService.DropUsedUserIdAsync(userId!);
+        isImpersonating = false;
+        await SetUserNameAsync();
         NavManager.NavigateTo(string.Empty);
     }
 
-    protected internal User user = null!;
+    string? userId;
+    string? userName;
+    bool isImpersonating;
 
+    bool isDisplay = false;
     protected override async Task OnParametersSetAsync()
     {
         var claims = (await AuthStateTask).User;
         if (claims.Identity!.IsAuthenticated)
-            user = (await IUser.GetModelByIdAsync(claims.GetUserId()))!;
+        {
+            userId = claims.GetUserId();
+            await SetUserNameAsync();
+            isImpersonating = await UserService.IsImpersonating(userId!);
+        }
+        isDisplay = true;
     }
+
+    async Task SetUserNameAsync()
+        => userName = await UserService.GetCurrentUserNameAsync();
 }

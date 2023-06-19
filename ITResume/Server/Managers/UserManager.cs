@@ -1,4 +1,5 @@
 ﻿using ITResume.Server.Database;
+using ITResume.Shared;
 using ITResume.Shared.Models.Account;
 using ITResume.Shared.Models.Database;
 using ITResume.Shared.Models.Database.ITResumeModels.UniqueNameModels;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Octokit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +20,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Project = ITResume.Shared.Models.Database.ITResumeModels.UserModels.SkillUserModels.Project;
+using User = ITResume.Shared.Models.Database.User;
 
 namespace ITResume.Server.Managers;
 
@@ -25,9 +29,10 @@ public class UserManager : IUserService
 {
     readonly UserManager<User> userManager;
     readonly IHttpContextAccessor httpContextAccessor;
+    readonly ITResumeContext db;
     public UserManager(UserManager<User> userManager, ITResumeContext db, IHttpContextAccessor httpContextAccessor)
     {
-        (this.userManager, this.httpContextAccessor) = (userManager, httpContextAccessor);
+        (this.userManager, this.httpContextAccessor, this.db) = (userManager, httpContextAccessor, db);
         getModels = db.Users;
     }
 
@@ -35,6 +40,17 @@ public class UserManager : IUserService
     {
         await userManager.CreateAsync(model);
         return model;
+    }
+
+    public async Task UpdateModelAsync(User model)
+    {
+        db.Entry(model).State = EntityState.Modified;
+
+        var userDetails = model.UserDetails;
+        if (userDetails is not null)
+            db.Entry(userDetails).State = EntityState.Modified;
+
+        await db.SaveChangesAsync();
     }
 
     public async Task ChangeUsedUserIdAsync(string userId, string usedUserId)
@@ -72,6 +88,8 @@ public class UserManager : IUserService
         return await getModels.ToListAsync();
     }
 
+    public async Task<IEnumerable<User>> GetPublicProfilesAsync()
+        => (await GetAllModelsAsync()).Where(u => u.UserDetails?.IsPublicProfile ?? false);
 
     public async Task<User?> GetModelByIdAsync(string key)
         => await getModels.Include(u => u.UserDetails).FirstOrDefaultAsync(u => u.Id == key);
@@ -79,57 +97,60 @@ public class UserManager : IUserService
     public async Task<User?> GetUserByClaimsAsync(ClaimsPrincipal claims)
         => await GetModelByIdAsync(claims.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-    public async Task<IEnumerable<Achievement>> GetUserAchievementsAsync()
+    public async Task<string?> GetUserIdByUserNameAsync(string userName)
+        => (await GetUserByNameAsync(userName))?.Id;
+
+    public async Task<bool> IsPublicProfile(string userName)
+        => (await GetUserByNameAsync(userName))?.UserDetails?.IsPublicProfile ?? false;
+
+    public async Task<IEnumerable<Achievement>> GetCurrentUserAchievementsAsync()
     {
         getModels = getModels.Include(u => u.Achievements);
         return (await GetUsedUserAsync()).Achievements!;
     }
 
-    public async Task<Contact?> GetUserContactAsync()
+    public async Task<Contact?> GetCurrentUserContactAsync()
     {
         getModels = getModels.Include(u => u.Contact).ThenInclude(c => c!.Country);
         return (await GetUsedUserAsync()).Contact!;
     }
 
-    public async Task<IEnumerable<Education>> GetUserEducationsAsync()
+    public async Task<IEnumerable<Education>> GetCurrentUserEducationsAsync()
     {
         getModels = getModels.Include(u => u.Educations)!.ThenInclude(c => c.Country);
         return (await GetUsedUserAsync()).Educations!;
     }
 
-    public async Task<IEnumerable<Employee>> GetUserEmployeesAsync()
+    public async Task<IEnumerable<Employee>> GetCurrentUserEmployeesAsync()
     {
         getModels = getModels.Include(u => u!.Employees)!.ThenInclude(c => c!.Company)!.Include(u => u!.Employees)!.ThenInclude(u => u!.Technologies)!.Include(u => u!.Employees)!.ThenInclude(u => u.ProgrammingLanguages);
         return (await GetUsedUserAsync()).Employees!;
     }
 
-    public async Task<IEnumerable<ForeignLanguage>> GetUserForeignLanguagesAsync()
+    public async Task<IEnumerable<ForeignLanguage>> GetCurrentUserForeignLanguagesAsync()
     {
         getModels = getModels.Include(u => u.ForeignLanguages)!.ThenInclude(c => c.HumanLanguage);
         return (await GetUsedUserAsync()).ForeignLanguages!;
     }
 
-    public async Task<IEnumerable<ProgrammingLanguage>> GetUserProgrammingLanguagesAsync()
+    public async Task<IEnumerable<ProgrammingLanguage>> GetCurrentUserProgrammingLanguagesAsync()
     {
         getModels = getModels.Include(u => u.ProgrammingLanguages);
         return (await GetUsedUserAsync()).ProgrammingLanguages!;
     }
 
-    public async Task<IEnumerable<Project>> GetUserProjectsAsync()
+    public async Task<IEnumerable<Project>> GetCurrentUserProjectsAsync()
     {
         getModels = getModels.Include(u => u.Projects)!.ThenInclude(c => c.ProgrammingLanguages)!.Include(u => u.Projects)!.ThenInclude(u => u.Technologies);
         return (await GetUsedUserAsync()).Projects!;
     }
 
-    public async Task<IEnumerable<Technology>> GetUserTechnologiesAsync()
+    public async Task<IEnumerable<Technology>> GetCurrentUserTechnologiesAsync()
     {
         getModels = getModels.Include(u => u.Technologies);
         return (await GetUsedUserAsync()).Technologies!;
     }
 
-
-    public async Task UpdateModelAsync(User model)
-        => await userManager.UpdateAsync(model);
 
     public async Task<User> GetUsedUserAsync()
     {
@@ -205,4 +226,78 @@ public class UserManager : IUserService
             throw new ArgumentException($"The user with id '{userId}' doesn't exist");
         return user!;
     }
+
+
+    async Task<User> GetPublicUserProfileById(string userId)
+    {
+        var claims = httpContextAccessor.HttpContext?.User;
+
+        User user = await GetUserByIdAsync(userId);
+
+        bool isItCurrentUser = false, isAdmin = false;
+        if (claims?.Identity?.IsAuthenticated ?? false)
+        {
+            User currentUser = await GetUsedUserAsync();
+            isItCurrentUser = currentUser.Id == userId;
+            isAdmin = claims.IsInRole(Roles.Admin);
+        }
+
+        if ((user.UserDetails?.IsPublicProfile ?? false) || isItCurrentUser || isAdmin)
+            return user;
+        throw new AccessViolationException();
+    }
+
+    public async Task<Contact?> GetUserContactAsync(string userId)
+    {
+        getModels = getModels.Include(u => u.Contact).ThenInclude(c => c!.Country);
+        return (await GetPublicUserProfileById(userId)).Contact!;
+    }
+
+    public async Task<IEnumerable<Achievement>> GetUserAchievementsAsync(string userId)
+    {
+        getModels = getModels.Include(u => u.Achievements);
+        return (await GetPublicUserProfileById(userId)).Achievements!;
+    }
+
+    public async Task<IEnumerable<Project>> GetUserProjectsAsync(string userId)
+    {
+        getModels = getModels.Include(u => u.Projects)!.ThenInclude(c => c.ProgrammingLanguages)!.Include(u => u.Projects)!.ThenInclude(u => u.Technologies);
+        return (await GetPublicUserProfileById(userId)).Projects!;
+    }
+
+    public async Task<IEnumerable<Employee>> GetUserEmployeesAsync(string userId)
+    {
+        getModels = getModels.Include(u => u!.Employees)!.ThenInclude(c => c!.Company)!.Include(u => u!.Employees)!.ThenInclude(u => u!.Technologies)!.Include(u => u!.Employees)!.ThenInclude(u => u.ProgrammingLanguages);
+        return (await GetPublicUserProfileById(userId)).Employees!;
+    }
+
+    public async Task<IEnumerable<Technology>> GetUserTechnologiesAsync(string userId)
+    {
+        getModels = getModels.Include(u => u.Technologies);
+        return (await GetPublicUserProfileById(userId)).Technologies!;
+    }
+
+    public async Task<IEnumerable<Education>> GetUserEducationsAsync(string userId)
+    {
+        getModels = getModels.Include(u => u.Educations)!.ThenInclude(c => c.Country);
+        return (await GetPublicUserProfileById(userId)).Educations!;
+    }
+
+    public async Task<IEnumerable<ForeignLanguage>> GetUserForeignLanguagesAsync(string userId)
+    {
+        getModels = getModels.Include(u => u.ForeignLanguages)!.ThenInclude(c => c.HumanLanguage);
+        return (await GetPublicUserProfileById(userId)).ForeignLanguages!;
+    }
+
+    public async Task<IEnumerable<ProgrammingLanguage>> GetUserProgrammingLanguagesAsync(string userId)
+    {
+        getModels = getModels.Include(u => u.ProgrammingLanguages);
+        return (await GetPublicUserProfileById(userId)).ProgrammingLanguages!;
+    }
+
+    public async Task<string?> GetCurrentUserNameAsync()
+        => (await GetUsedUserAsync())?.UserName;
+
+    public async Task<bool> IsImpersonating(string userId)
+        => !string.IsNullOrEmpty((await GetModelByIdAsync(userId))?.UsedUserId);
 }

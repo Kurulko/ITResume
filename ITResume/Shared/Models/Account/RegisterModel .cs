@@ -14,7 +14,7 @@ public class RegisterModel : AccountModel
     [DataType(DataType.EmailAddress)]
     public string? Email { get; set; }
 
-    [Display(Name = "Confirm password*")]
+    [Display(Name = "Confirm password")]
     [Required(ErrorMessage = "Repeat password")]
     [DataType(DataType.Password)]
     [MinLength(8, ErrorMessage = "Password must be at least {1} characters long")]

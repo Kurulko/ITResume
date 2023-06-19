@@ -1,18 +1,24 @@
 ﻿@page "/login"
 @layout AccountLayout
 
+<h3 class="text-left">@AccountMode.Login</h3>
+<hr />
+<br />
 <AccountPage AccountMode="AccountMode.Login" AccountModel="model" DoAction="Login">
     <div class="form-group">
+        <DisplayName For="@(() => model.Name)" />
         <SfTextBox @bind-Value="model.Name" Placeholder="Name" />
         <ValidationMessage For="@(() => model.Name)" />
     </div>
     <br />
     <div class="form-group">
+        <DisplayName For="@(() => model.Password)" />
         <SfTextBox @bind-Value="model.Password" Placeholder="Password" Type="InputType.Password" />
         <ValidationMessage For="@(() => model.Password)" />
     </div>
     <br />
     <div class="form-group">
+        <DisplayName For="@(() => model.RememberMe)" />
         <SfCheckBox @bind-Checked="model.RememberMe" />
     </div>
     <br />

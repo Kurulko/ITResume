@@ -2,7 +2,7 @@
 @inherits _UserLayout
 
 <CascadingValue Value="5" Name="PageSize">
-    <ComplexEditUserITResumeDbModels Service="EducationService" TModel="Education" GetModels="@(us => us.GetUserEducationsAsync())">
+    <ComplexEditUserITResumeDbModels Service="EducationService" TModel="Education" GetModels="@(us => us.GetCurrentUserEducationsAsync())">
         <Columns>
             <GridColumn Field=@nameof(Education.University) />
             <GridColumn Field=@nameof(Education.Faculty) />

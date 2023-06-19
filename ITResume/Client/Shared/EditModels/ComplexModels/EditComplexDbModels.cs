@@ -1,14 +1,14 @@
 ﻿using ITResume.Client.Extensions;
 using ITResume.Shared.Models.Database;
+using ITResume.Shared.Models.Database.ITResumeModels.UserModels;
 using ITResume.Shared.Services;
-using Microsoft.AspNetCore.Components;
 using Syncfusion.Blazor;
 using Syncfusion.Blazor.Grids;
 
-namespace ITResume.Client.Shared.EditModels;
+namespace ITResume.Client.Shared.EditModels.ComplexModels;
 
-public abstract class EditDbModels<TModel, TKey> : BaseComponent
-     where TModel : class, IDbModel
+public abstract class EditComplexDbModels<TModel, TKey> : BaseComponent
+     where TModel : IDbModel
 {
     protected bool isDisplay;
     protected string? error;
@@ -22,30 +22,19 @@ public abstract class EditDbModels<TModel, TKey> : BaseComponent
     protected bool isAllowPaging;
     protected bool isAllowOperationsWithModels;
 
-    [CascadingParameter(Name = "PageSize")]
-    public int PageSize { get; set; } = 50;
+    protected virtual int PageSize { get; set; } = 50;
 
-    protected bool isDetails => RowDetails is not null;
+    protected abstract IDbModelService<TModel, TKey> Service { get; }
 
-    [Parameter]
-    public RenderFragment<TModel>? RowDetails { get; set; }
+    protected abstract TKey GetKeyFromModel(TModel model);
 
-    [Parameter]
-    public RenderFragment ChildContent { get; set; } = null!;
+    protected virtual async Task<IEnumerable<TModel>> GetModels()
+        => await Service.GetAllModelsAsync();
 
-    [Parameter]
-    public Func<TModel, TKey> IdFromModel { get; set; } = null!;
+    protected virtual Task<TModel> PrepareModel(TModel model)
+        => Task.FromResult(model);
 
-    [Parameter]
-    public IDbModelService<TModel, TKey> Service { get; set; } = null!;
-
-    [Parameter]
-    public Func<Task<IEnumerable<TModel>>>? GetModels { get; set; }
-
-    [Parameter]
-    public Func<TModel, TModel>? PrepareModelBeforeSaving { get; set; }
-
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
         try
         {
@@ -59,17 +48,16 @@ public abstract class EditDbModels<TModel, TKey> : BaseComponent
         }
     }
 
-    public async void ActionBeginHandler(ActionEventArgs<TModel> Args)
+    public virtual async void ActionBeginHandler(ActionEventArgs<TModel> Args)
     {
         try
         {
             TModel model = Args.Data;
 
-            if (PrepareModelBeforeSaving is not null)
-                model = PrepareModelBeforeSaving(model);
-
             if (Args.RequestType == Syncfusion.Blazor.Grids.Action.Save)
             {
+                await PrepareModel(model);
+
                 if (Args.Action == Enums.EditMode.Add.ToString())
                     await Service.AddModelAsync(model);
                 else
@@ -80,7 +68,7 @@ public abstract class EditDbModels<TModel, TKey> : BaseComponent
             }
             else if (Args.RequestType == Syncfusion.Blazor.Grids.Action.Delete)
             {
-                await Service.DeleteModelAsync(IdFromModel(model));
+                await Service.DeleteModelAsync(GetKeyFromModel(model));
                 await Refresh();
             }
 
@@ -92,20 +80,20 @@ public abstract class EditDbModels<TModel, TKey> : BaseComponent
         }
     }
 
-    async Task Refresh()
+    protected new async Task Refresh()
     {
         await SetModels();
         AssignToIsAllows();
         await modelGrid.Refresh();
     }
 
-    void AssignToIsAllows()
+    protected void AssignToIsAllows()
     {
         isAllowPaging = models is not null && models.Count() > PageSize;
         isAllowOperationsWithModels = models.CountOrDefault() > 1;
     }
 
-    async Task SetModels()
-        => models = await (GetModels is null ? Service.GetAllModelsAsync() : GetModels());
+    protected virtual async Task SetModels()
+        => models = await GetModels();
 
 }

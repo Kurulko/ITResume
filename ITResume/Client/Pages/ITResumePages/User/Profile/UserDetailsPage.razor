@@ -83,7 +83,7 @@ else
                     <DisplayName For="(() => user!.UserDetails!.IsPublicProfile)" />
                 </th>
                 <td>
-                    @user!.UserDetails?.IsPublicProfile
+                    @(user!.UserDetails?.IsPublicProfile ?? false)
                 </td>
             </tr>
         </tbody>
@@ -91,7 +91,6 @@ else
     <div class="row">
         <div class="col-md-4"></div>
         <div class="col-md-4">
-            <NavLink href="user/edit" class="btn btn-warning">Edit Profile</NavLink><br /><br />
             <NavLink href="user/edit-password" class="btn btn-warning">Edit Password</NavLink><br /><br />
             <br />
             <br />

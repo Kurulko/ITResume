@@ -29,6 +29,15 @@ public class UserManager : DbModelManager<User, string>, IUserService
 {
     public UserManager(HttpClient httpClient) : base(httpClient, "users") { }
 
+    public async Task<string?> GetUserIdByUserNameAsync(string userName)
+        => await CheckModel($"userid-by-name/{userName}");
+
+    public async Task<bool> IsPublicProfile(string userName)
+        => await CheckModel<bool>($"is-public-profile/{userName}");
+
+    public async Task<IEnumerable<User>> GetPublicProfilesAsync()
+        => (await httpClient.GetFromJsonAsync<IEnumerable<User>>($"{url}/public-profiles"))!;
+
     public async Task ChangeUsedUserIdAsync(string userId, string usedUserId)
         => await CheckResponseMessage(await httpClient.PutAsJsonAsync($"{url}/change-usedUserId", new UserAndUsedUser() { UserId = userId, UsedUserId = usedUserId }));
 
@@ -38,8 +47,6 @@ public class UserManager : DbModelManager<User, string>, IUserService
     public async Task<User> GetUsedUserAsync()
         => (await httpClient.GetFromJsonAsync<User>($"{url}/usedUser"))!;
 
-    public async Task<IEnumerable<Achievement>> GetUserAchievementsAsync()
-        => (await httpClient.GetFromJsonAsync<IEnumerable<Achievement>>($"{url}/user-achievements"))!;
 
     public async Task<User?> GetUserByClaimsAsync(ClaimsPrincipal _ = default!)
         => await CheckModel<User>("current");
@@ -47,26 +54,66 @@ public class UserManager : DbModelManager<User, string>, IUserService
     public async Task<User?> GetUserByNameAsync(string name)
         => await CheckModel<User>($"name/{name}");
 
-    public async Task<Contact?> GetUserContactAsync()
-        => await CheckModel<Contact>("user-contact");
+    public async Task<string?> GetCurrentUserNameAsync()
+        => await CheckModel("current-username");
 
-    public async Task<IEnumerable<Education>> GetUserEducationsAsync()
-        => (await httpClient.GetFromJsonAsync<IEnumerable<Education>>($"{url}/user-educations"))!;
+    public async Task<bool> IsImpersonating(string userId)
+        => (await httpClient.GetFromJsonAsync<bool>($"{url}/{userId}/is-impersonating"))!;
 
-    public async Task<IEnumerable<Employee>> GetUserEmployeesAsync()
-        => (await httpClient.GetFromJsonAsync<IEnumerable<Employee>>($"{url}/user-employees"))!;
 
-    public async Task<IEnumerable<ForeignLanguage>> GetUserForeignLanguagesAsync()
-        => (await httpClient.GetFromJsonAsync<IEnumerable<ForeignLanguage>>($"{url}/user-foreign-languages"))!;
+    const string userContact = "user-contact", userAchievements = "user-achievements", userEducations = "user-educations"
+    , userEmployees = "user-employees", userProgrammingLanguages = "user-programming-languages", userForeignLanguages = "user-foreign-languages"
+    , userProjects = "user-projects", userTechnologies = "user-technologies";
 
-    public async Task<IEnumerable<ProgrammingLanguage>> GetUserProgrammingLanguagesAsync()
-        => (await httpClient.GetFromJsonAsync<IEnumerable<ProgrammingLanguage>>($"{url}/user-programming-languages"))!;
+    public async Task<Contact?> GetCurrentUserContactAsync()
+        => await CheckModel<Contact>(userContact);
 
-    public async Task<IEnumerable<Project>> GetUserProjectsAsync()
-        => (await httpClient.GetFromJsonAsync<IEnumerable<Project>>($"{url}/user-projects"))!;
+    public async Task<IEnumerable<Achievement>> GetCurrentUserAchievementsAsync()
+        => (await httpClient.GetFromJsonAsync<IEnumerable<Achievement>>($"{url}/{userAchievements}"))!;
 
-    public async Task<IEnumerable<Technology>> GetUserTechnologiesAsync()
-        => (await httpClient.GetFromJsonAsync<IEnumerable<Technology>>($"{url}/user-technologies"))!;
+    public async Task<IEnumerable<Education>> GetCurrentUserEducationsAsync()
+        => (await httpClient.GetFromJsonAsync<IEnumerable<Education>>($"{url}/{userEducations}"))!;
+
+    public async Task<IEnumerable<Employee>> GetCurrentUserEmployeesAsync()
+        => (await httpClient.GetFromJsonAsync<IEnumerable<Employee>>($"{url}/{userEmployees}"))!;
+
+    public async Task<IEnumerable<ForeignLanguage>> GetCurrentUserForeignLanguagesAsync()
+        => (await httpClient.GetFromJsonAsync<IEnumerable<ForeignLanguage>>($"{url}/{userForeignLanguages}"))!;
+
+    public async Task<IEnumerable<ProgrammingLanguage>> GetCurrentUserProgrammingLanguagesAsync()
+        => (await httpClient.GetFromJsonAsync<IEnumerable<ProgrammingLanguage>>($"{url}/{userProgrammingLanguages}"))!;
+
+    public async Task<IEnumerable<Project>> GetCurrentUserProjectsAsync()
+        => (await httpClient.GetFromJsonAsync<IEnumerable<Project>>($"{url}/{userProjects}"))!;
+
+    public async Task<IEnumerable<Technology>> GetCurrentUserTechnologiesAsync()
+        => (await httpClient.GetFromJsonAsync<IEnumerable<Technology>>($"{url}/{userTechnologies}"))!;
+
+
+    public async Task<Contact?> GetUserContactAsync(string userId)
+    => await CheckModel<Contact>($"{userContact}/{userId}");
+
+    public async Task<IEnumerable<Achievement>> GetUserAchievementsAsync(string userId)
+    => (await httpClient.GetFromJsonAsync<IEnumerable<Achievement>>($"{url}/{userAchievements}/{userId}"))!;
+
+    public async Task<IEnumerable<Education>> GetUserEducationsAsync(string userId)
+        => (await httpClient.GetFromJsonAsync<IEnumerable<Education>>($"{url}/{userEducations}/{userId}"))!;
+
+    public async Task<IEnumerable<Employee>> GetUserEmployeesAsync(string userId)
+        => (await httpClient.GetFromJsonAsync<IEnumerable<Employee>>($"{url}/{userEmployees}/{userId}"))!;
+
+    public async Task<IEnumerable<ForeignLanguage>> GetUserForeignLanguagesAsync(string userId)
+        => (await httpClient.GetFromJsonAsync<IEnumerable<ForeignLanguage>>($"{url}/{userForeignLanguages}/{userId}"))!;
+
+    public async Task<IEnumerable<ProgrammingLanguage>> GetUserProgrammingLanguagesAsync(string userId)
+        => (await httpClient.GetFromJsonAsync<IEnumerable<ProgrammingLanguage>>($"{url}/{userProgrammingLanguages}/{userId}"))!;
+
+    public async Task<IEnumerable<Project>> GetUserProjectsAsync(string userId)
+        => (await httpClient.GetFromJsonAsync<IEnumerable<Project>>($"{url}/{userProjects}/{userId}"))!;
+
+    public async Task<IEnumerable<Technology>> GetUserTechnologiesAsync(string userId)
+        => (await httpClient.GetFromJsonAsync<IEnumerable<Technology>>($"{url}/{userTechnologies}/{userId}"))!;
+
 
     public async Task ChangeUserPasswordAsync(ChangePassword model)
         => await CheckResponseMessage(await httpClient.PutAsJsonAsync($"{url}/password", model));

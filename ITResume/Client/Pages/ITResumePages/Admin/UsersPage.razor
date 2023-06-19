@@ -1,27 +1,30 @@
 ﻿@page "/users"
-@inherits _AdminLayout
+@using ITResume.Client.Shared.EditModels.ComplexModels;
+@inherits EditComplexDbModels<User, string>
+@attribute [Authorize(Roles = Roles.Admin)]
 
-@if (isLoading)
+@if (!isDisplay)
 {
     <Spinner />
 }
 else
 {
+    bool isAllowEditing = true;
     <ShowError Error="@error">
-        <SfGrid @ref="modelGrid" DataSource="models" Toolbar="@(Enum.GetValues<Enums.EditMode>().Select(em => em.ToString()))" AllowPaging="true"
-            AllowSorting="true" ClipMode="ClipMode.EllipsisWithTooltip">
+        <SfGrid @ref="modelGrid" DataSource="models" Toolbar="@GetToolbar()" AllowPaging="@isAllowPaging"
+            AllowSorting="isAllowOperationsWithModels" AllowGrouping="isAllowOperationsWithModels" ClipMode="ClipMode.EllipsisWithTooltip">
             <ComplexEditDbModelsSettings />
             <GridEvents CommandClicked="OnCommandClicked" OnActionBegin="ActionBeginHandler" TValue="User" />
-            <GridPageSettings PageSize="50" />
+            <GridPageSettings PageSize="@PageSize" />
             <GridColumns>
                 <GridColumn Field=@nameof(User.Id) IsPrimaryKey="true" AllowAdding="false" AllowEditing="false" />
-                <GridColumn Field=@nameof(User.UserName) AllowEditing="false" />
-                <GridColumn Field=@nameof(User.FirstName) AllowEditing="false" />
-                <GridColumn Field=@nameof(User.LastName) AllowEditing="false"/>
-                <GridColumn Field=@nameof(User.FatherName) AllowEditing="false"/>
-                <GridColumn Field=@nameof(User.Email) AllowEditing="false"/>
-                <GridColumn Field=@nameof(User.Birthday) AllowEditing="false"/>
-                <GridColumn Field=@nameof(User.Registered) AllowEditing="false" />
+                <GridColumn Field=@nameof(User.UserName) AllowEditing="isAllowEditing" />
+                <GridColumn Field=@nameof(User.FirstName) AllowEditing="isAllowEditing" />
+                <GridColumn Field=@nameof(User.LastName) AllowEditing="isAllowEditing" />
+                <GridColumn Field=@nameof(User.FatherName) AllowEditing="isAllowEditing" />
+                <GridColumn Field=@nameof(User.Email) AllowEditing="isAllowEditing" />
+                <GridColumn Field=@nameof(User.Birthday) AllowEditing="isAllowEditing" />
+                <GridColumn Field=@nameof(User.Registered) AllowEditing="isAllowEditing" />
                 <GridColumn HeaderText="Roles" AllowAdding=false>
                     <Template>
                         @{
@@ -68,7 +71,6 @@ else
                             @if (!HasUserPassword(user))
                             {
                                 <br />
-
                                 <br />
                                 <span>Password</span>
                                 <SfTextBox Value="@password" ValueChanged="HandlePasswordSelection" Type="InputType.Password" Placeholder="Password" />
@@ -88,14 +90,8 @@ else
 }
 
 @code {
-
-    string? error;
-    SfGrid<User> modelGrid = null!;
-
     IEnumerable<string>? allRoles;
     Dictionary<string, List<string>>? usersRoles;
-
-    IEnumerable<User>? models;
 
     [Inject]
     public IUserService UserService { get; set; } = null!;
@@ -106,7 +102,15 @@ else
     [Inject]
     public NavigationManager NavManager { get; set; } = null!;
 
-    public async Task OnCommandClicked(CommandClickEventArgs<User> args)
+    [Inject]
+    public IJSRuntime JSRuntime { get; set; } = null!;
+
+    protected override IDbModelService<User, string> Service => UserService;
+
+    protected override string GetKeyFromModel(User model)
+        => model.Id;
+
+    async Task OnCommandClicked(CommandClickEventArgs<User> args)
     {
         if (args.CommandColumn.ButtonOption.Content == "Impersonate")
         {
@@ -115,6 +119,7 @@ else
             await UserService.ChangeUsedUserIdAsync(userId, usedUserId);
 
             NavManager.NavigateTo(string.Empty);
+            await JSRuntime.InvokeVoidAsync("location.reload");
         }
     }
 
@@ -122,14 +127,7 @@ else
         => string.IsNullOrEmpty(user.Id) ? "Add New User" : $"Edit {user.UserName} Details";
 
 
-    bool isLoading = true;
-    protected override async Task OnInitializedAsync()
-    {
-        await SetModels();
-        isLoading = false;
-    }
-
-    public async void ActionBeginHandler(ActionEventArgs<User> args)
+    public override async void ActionBeginHandler(ActionEventArgs<User> args)
     {
         try
         {
@@ -139,9 +137,8 @@ else
             {
                 if (args.Action == Enums.EditMode.Add.ToString())
                     await UserService.AddModelAsync(user);
-
-                //else if (args.Action == Enums.EditMode.Edit.ToString())
-                //    await UserService.UpdateModelAsync(user);
+                else if (args.Action == Enums.EditMode.Edit.ToString())
+                    await UserService.UpdateModelAsync(user);
 
                 await Refresh();
             }
@@ -158,24 +155,17 @@ else
         }
     }
 
-    async Task Refresh()
-    {
-        await SetModels();
-        await modelGrid.Refresh();
-    }
 
-    async Task SetModels()
+    protected override async Task SetModels()
     {
         models = await UserService.GetAllModelsAsync();
         allRoles = (await RoleService.GetAllModelsAsync()).Select(r => r.Name);
         await SetUserRoles();
-
     }
 
     async Task SetUserRoles()
     {
-        var urs = (await UserService.GetAllModelsAsync())
-            .Select(async u => new KeyValuePair<string, List<string>>(u.Id, (await UserService.GetRolesAsync(u.Id)).ToList()));
+        var urs = models.Select(async u => new KeyValuePair<string, List<string>>(u.Id, (await UserService.GetRolesAsync(u.Id)).ToList()));
 
         List<KeyValuePair<string, List<string>>> ursList = new();
         foreach (var ur in urs)

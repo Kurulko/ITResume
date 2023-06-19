@@ -1,28 +1,35 @@
 ﻿@page "/register"
 @layout AccountLayout
 
+<h3 class="text-left">@AccountMode.Register</h3>
+<hr /><br />
 <AccountPage AccountMode="AccountMode.Register" AccountModel="model" DoAction="Register" >
     <div class="form-group">
+        <DisplayName For="@(() => model.Name)" />
         <SfTextBox @bind-Value="model.Name" Placeholder="Name" />
         <ValidationMessage For="@(() => model.Name)" />
     </div>
     <br />
     <div class="form-group">
+        <DisplayName For="@(() => model.Email)" />
         <SfTextBox @bind-Value="model.Email" Placeholder="Email" Type="InputType.Email" />
         <ValidationMessage For="@(() => model.Email)" />
     </div>
     <br />
     <div class="form-group">
+        <DisplayName For="@(() => model.Password)" />
         <SfTextBox @bind-Value="model.Password" Placeholder="Password" Type="InputType.Password" />
         <ValidationMessage For="@(() => model.Password)" />
     </div>
     <br />
     <div class="form-group">
+        <DisplayName For="@(() => model.PasswordConfirm)" />
         <SfTextBox @bind-Value="model.PasswordConfirm" Placeholder="PasswordConfirm" Type="InputType.Password" />
         <ValidationMessage For="@(() => model.PasswordConfirm)" />
     </div>
     <br />
     <div class="form-group">
+        <DisplayName For="@(() => model.RememberMe)" />
         <SfCheckBox @bind-Checked="model.RememberMe" />
     </div>
     <br />

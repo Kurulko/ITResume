@@ -12,8 +12,8 @@
 else
 {
     <ShowError Error="@error">
-        <SfGrid @ref="modelGrid" DataSource="models" Toolbar="@GetToolbar()" @bind-AllowPaging="isAllowPaging" 
-            @bind-AllowGrouping="isAllowOperationsWithModels" @bind-AllowSorting="isAllowOperationsWithModels" ClipMode="ClipMode.EllipsisWithTooltip">
+        <SfGrid @ref="modelGrid" DataSource="models" Toolbar="@GetToolbar()" AllowPaging="isAllowPaging" 
+            AllowGrouping="isAllowOperationsWithModels" AllowSorting="isAllowOperationsWithModels" ClipMode="ClipMode.EllipsisWithTooltip">
             @if (isDetails)
             {
                 <GridTemplates>

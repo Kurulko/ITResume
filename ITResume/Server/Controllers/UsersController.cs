@@ -23,6 +23,38 @@ public class UsersController : AdminDbModelsController<User, string>
     IUserService userService => (service as IUserService)!;
 
     [AllowAnonymous]
+    [HttpGet("userid-by-name/{userName}")]
+    public async Task<string?> GetUserIdByUserNameAsync(string userName)
+        => await userService.GetUserIdByUserNameAsync(userName);
+
+    [AllowAnonymous]
+    [HttpGet("is-public-profile/{userName}")]
+    public async Task<bool> IsPublicProfile(string userName)
+        => await userService.IsPublicProfile(userName);
+
+    [AllowAnonymous]
+    [HttpGet("public-profiles")]
+    public async Task<IEnumerable<User>> GetPublicProfilesAsync()
+        => await userService.GetPublicProfilesAsync();
+
+
+    [AllowAnonymous]
+    [HttpGet("current-username")]
+    public async Task<string?> GetCurrentUserNameAsync()
+    {
+        CheckAccess();
+        return await userService.GetCurrentUserNameAsync();
+    }
+
+    [AllowAnonymous]
+    [HttpGet("{userId}/is-impersonating")]
+    public async Task<bool> IsImpersonating(string userId)
+    {
+        CheckAccessForUser(userId);
+        return await userService.IsImpersonating(userId);
+    }
+
+    [AllowAnonymous]
     public override async Task<User?> GetModelByIdAsync(string key)
     {
         CheckAccessForUser(key);
@@ -60,70 +92,112 @@ public class UsersController : AdminDbModelsController<User, string>
     public async Task DropUsedUserIdAsync(UserAndUsedUser args)
         => await ReturnOkIfEverithingIsGood(async () => await userService.DropUsedUserIdAsync(args.UserId));
 
+
+    const string userContact = "user-contact" ,userAchievements = "user-achievements" ,userEducations = "user-educations"
+    ,userEmployees = "user-employees" ,userProgrammingLanguages = "user-programming-languages", userForeignLanguages = "user-foreign-languages"
+    ,userProjects = "user-projects" ,userTechnologies = "user-technologies";
+
     [AllowAnonymous]
-    [HttpGet("user-contact")]
-    public virtual async Task<Contact?> GetUserContactAsync()
+    [HttpGet(userContact)]
+    public virtual async Task<Contact?> GetCurrentUserContactAsync()
     {
         CheckAccess();
-        return await userService.GetUserContactAsync();
+        return await userService.GetCurrentUserContactAsync();
     }
 
     [AllowAnonymous]
-    [HttpGet("user-achievements")]
-    public virtual async Task<IEnumerable<Achievement>> GetUserAchievementsAsync()
+    [HttpGet(userAchievements)]
+    public virtual async Task<IEnumerable<Achievement>> GetCurrentUserAchievementsAsync()
     {
         CheckAccess();
-        return await userService.GetUserAchievementsAsync();
+        return await userService.GetCurrentUserAchievementsAsync();
     }
 
 
     [AllowAnonymous]
-    [HttpGet("user-educations")]
-    public virtual async Task<IEnumerable<Education>> GetUserEducationsAsync()
+    [HttpGet(userEducations)]
+    public virtual async Task<IEnumerable<Education>> GetCurrentUserEducationsAsync()
     {
         CheckAccess();
-        return await userService.GetUserEducationsAsync();
+        return await userService.GetCurrentUserEducationsAsync();
     }
 
     [AllowAnonymous]
-    [HttpGet("user-employees")]
-    public virtual async Task<IEnumerable<Employee>> GetUserEmployeesAsync()
+    [HttpGet(userEmployees)]
+    public virtual async Task<IEnumerable<Employee>> GetCurrentUserEmployeesAsync()
     {
         CheckAccess();
-        return await userService.GetUserEmployeesAsync();
+        return await userService.GetCurrentUserEmployeesAsync();
     }
 
     [AllowAnonymous]
-    [HttpGet("user-foreign-languages")]
-    public virtual async Task<IEnumerable<ForeignLanguage>> GetUserForeignLanguagesAsync()
+    [HttpGet(userForeignLanguages)]
+    public virtual async Task<IEnumerable<ForeignLanguage>> GetCurrentUserForeignLanguagesAsync()
     {
         CheckAccess();
-        return await userService.GetUserForeignLanguagesAsync();
+        return await userService.GetCurrentUserForeignLanguagesAsync();
     }
 
     [AllowAnonymous]
-    [HttpGet("user-programming-languages")]
-    public virtual async Task<IEnumerable<ProgrammingLanguage>> GetUserProgrammingLanguagesAsync()
+    [HttpGet(userProgrammingLanguages)]
+    public virtual async Task<IEnumerable<ProgrammingLanguage>> GetCurrentUserProgrammingLanguagesAsync()
     {
         CheckAccess();
-        return await userService.GetUserProgrammingLanguagesAsync();
+        return await userService.GetCurrentUserProgrammingLanguagesAsync();
     }
 
     [AllowAnonymous]
-    [HttpGet("user-projects")]
-    public virtual async Task<IEnumerable<Project>> GetUserProjectsAsync()
+    [HttpGet(userProjects)]
+    public virtual async Task<IEnumerable<Project>> GetCurrentUserProjectsAsync()
     {
         CheckAccess();
-        return await userService.GetUserProjectsAsync();
+        return await userService.GetCurrentUserProjectsAsync();
     }
 
+
+
+
     [AllowAnonymous]
-    [HttpGet("user-technologies")]
-    public virtual async Task<IEnumerable<Technology>> GetUserTechnologiesAsync()
-    {
-        CheckAccess();
-        return await userService.GetUserTechnologiesAsync();
-    }
+    [HttpGet(userContact + "/{userId}")]
+    public virtual async Task<Contact?> GetUserContactAsync(string userId)
+        => await userService.GetUserContactAsync(userId);
+
+    [AllowAnonymous]
+    [HttpGet(userAchievements + "/{userId}")]
+    public virtual async Task<IEnumerable<Achievement>> GetUserAchievementsAsync(string userId)
+        => await userService.GetUserAchievementsAsync(userId);
+
+
+    [AllowAnonymous]
+    [HttpGet(userEducations + "/{userId}")]
+    public virtual async Task<IEnumerable<Education>> GetUserEducationsAsync(string userId)
+        => await userService.GetUserEducationsAsync(userId);
+
+    [AllowAnonymous]
+    [HttpGet(userEmployees + "/{userId}")]
+    public virtual async Task<IEnumerable<Employee>> GetUserEmployeesAsync(string userId)
+        => await userService.GetUserEmployeesAsync(userId);
+
+    [AllowAnonymous]
+    [HttpGet(userForeignLanguages + "/{userId}")]
+    public virtual async Task<IEnumerable<ForeignLanguage>> GetUserForeignLanguagesAsync(string userId)
+        => await userService.GetUserForeignLanguagesAsync(userId);
+
+    [AllowAnonymous]
+    [HttpGet(userProgrammingLanguages + "/{userId}")]
+    public virtual async Task<IEnumerable<ProgrammingLanguage>> GetUserProgrammingLanguagesAsync(string userId)
+        => await userService.GetUserProgrammingLanguagesAsync(userId);
+
+    [AllowAnonymous]
+    [HttpGet(userProjects + "/{userId}")]
+    public virtual async Task<IEnumerable<Project>> GetUserProjectsAsync(string userId)
+        => await userService.GetUserProjectsAsync(userId);
+
+    [AllowAnonymous]
+    [HttpGet(userTechnologies + "/{userId}")]
+    public virtual async Task<IEnumerable<Technology>> GetUserTechnologiesAsync(string userId)
+        => await userService.GetUserTechnologiesAsync(userId);
+
 
     [AllowAnonymous]
     [HttpGet("{userId}/password")]

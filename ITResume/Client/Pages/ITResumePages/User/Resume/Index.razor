@@ -1,0 +1,220 @@
+﻿@page "/"
+@page "/index"
+@page "/public-resume/{UserName}"
+@attribute [AllowAnonymous]
+
+@if (string.IsNullOrEmpty(userId))
+{
+    <Spinner />
+}
+else
+{
+    <h1>@(!isEmptyUserName ? @$"{UserName}'s" : "Your") resume:</h1>
+    <br />
+    <CascadingValue Value="10" Name="PageSize">
+        <CascadingValue Value="false" Name="IsAllowChanging">
+            <center>
+                <div class="row" style="width: 50%;">
+
+                    <div class="col-md-5">
+
+                        <DisplayUserModels TModel="Achievement" GetModels="@(us => us.GetUserAchievementsAsync(userId!))" Context="achievement" HeaderText="Achievements">
+                            <RowBody>
+                                @achievement.Name - @achievement.Link
+                            </RowBody>
+                            <RowDetails>
+                                @achievement.Description
+                            </RowDetails>
+                        </DisplayUserModels>
+                        <br>
+                        <DisplayUserModels TModel="Education" GetModels="@(us => us.GetUserEducationsAsync(userId!))" Context="education" HeaderText="Educations">
+                            <RowBody>
+                                <b>@education.University</b>
+                                <br />
+                                @education.DegreeOfEducation, "@education.Specialty"
+                                - @(DateTime.Now.Year - education.StartEducation.Year) course
+                            </RowBody>
+                        </DisplayUserModels>
+                        <br>
+                        <DisplayUserModels TModel="ProgrammingLanguage" GetModels="@(us => us.GetUserProgrammingLanguagesAsync(userId!))" Context="programming" HeaderText="Programming Languages">
+                            <RowBody>
+                                @programming.Name
+                            </RowBody>
+                        </DisplayUserModels>
+                        <br>
+                        <DisplayUserModels TModel="Technology" GetModels="@(us => us.GetUserTechnologiesAsync(userId!))" Context="technology" HeaderText="Technologies">
+                            <RowBody>
+                                @technology.Name
+                            </RowBody>
+                        </DisplayUserModels>
+                        <br>
+                        <DisplayUserModels TModel="ForeignLanguage" GetModels="@(us => us.GetUserForeignLanguagesAsync(userId!))" Context="foreign" HeaderText="Languages">
+                            <RowBody>
+                                @foreign.HumanLanguage!.Name - @foreign.LanguageLevel
+                            </RowBody>
+                        </DisplayUserModels>
+                        <br>
+                        <DisplayUserModels TModel="Contact" GetModels="@(async us => new List<Contact>(){(await us.GetUserContactAsync(userId!))!})" Context="contact" HeaderText="Contact">
+                            <RowBody>
+                                <tr>
+                                    <th>
+                                        <DisplayName For="(() => contact!.Email)" />
+                                    </th>
+                                    <td>
+                                        @contact!.Email
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <DisplayName For="(() => contact.MobilePhone)" />
+                                    </th>
+                                    <td>
+                                        @contact.MobilePhone
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <DisplayName For="(() => contact.Github)" />
+                                    </th>
+                                    <td>
+                                        @contact.Github
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <DisplayName For="(() => contact.LinkedId)" />
+                                    </th>
+                                    <td>
+                                        @contact.LinkedId
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <DisplayName For="(() => contact.Habr)" />
+                                    </th>
+                                    <td>
+                                        @contact.Habr
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <DisplayName For="(() => contact.Stackoverflow)" />
+                                    </th>
+                                    <td>
+                                        @contact.Stackoverflow
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <DisplayName For="(() => contact.Telegram)" />
+                                    </th>
+                                    <td>
+                                        @contact.Telegram
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <label>Country</label>
+                                    </th>
+                                    <td>
+                                        @contact.Country?.Name
+                                    </td>
+                                </tr>
+                            </RowBody>
+                        </DisplayUserModels>
+                    </div>
+
+                    <div class="col-md-7">
+
+                        <DisplayUserModels TModel="Employee" GetModels="@(us => us.GetUserEmployeesAsync(userId!))" Context="experience" HeaderText="Experience">
+                            <RowBody>
+                                <b>
+                                    @experience.Post <br />
+                                    @experience.Company!.Name <br />
+                                    @if (experience.Technologies is not null)
+                                    {
+                                        <text>Technologies:</text>
+                                        @StringExtensions.ToString(experience.Technologies)
+                                        <br />
+                                    }
+                                    @if (experience.ProgrammingLanguages is not null)
+                                    {
+                                        <text>Programming languages:</text>
+                                        @StringExtensions.ToString(experience.ProgrammingLanguages)
+                                        <br />
+                                    }
+                                    @experience.StartWorking.ToString("MMMM yyyy") - @(experience.FinishWorking?.ToString("MMMM yyyy") ?? "now")
+                                </b>
+                            </RowBody>
+                            <RowDetails>
+                                @experience.Description
+                            </RowDetails>
+                        </DisplayUserModels>
+                        <br>
+                        <DisplayUserModels TModel="Project" GetModels="@(us => us.GetUserProjectsAsync(userId!))" Context="project" HeaderText="Projects">
+                            <RowBody>
+                                <b>@project.Name</b><br />
+                                (@project.Link)<br />
+                                @if (project.Technologies is not null)
+                                {
+                                    <text>Technologies:</text>
+                                    @StringExtensions.ToString(project.Technologies)
+                                    <br />
+                                }
+                                @if (project.ProgrammingLanguages is not null)
+                                {
+                                    <text>Programming languages:</text>
+                                    @StringExtensions.ToString(project.ProgrammingLanguages)
+                                    <br />
+                                }
+                                Work example: @project.WorkExample<br />
+                            </RowBody>
+                            <RowDetails>
+                                @project.Description
+                            </RowDetails>
+                        </DisplayUserModels>
+                    </div>
+                </div>
+            </center>
+        </CascadingValue>
+    </CascadingValue>
+}
+
+@code {
+    [Parameter]
+    public string? UserName { get; set; }
+
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthStateTask { get; set; } = null!;
+
+    [Inject]
+    public NavigationManager NavManager { get; set; } = null!;
+
+    [Inject]
+    public IUserService UserService { get; set; } = null!;
+
+    string? userId;
+    bool isEmptyUserName = false;
+    protected override async Task OnParametersSetAsync()
+    {
+        var claims = (await AuthStateTask).User;
+        bool isAuthenticated = claims.Identity?.IsAuthenticated ?? false;
+        isEmptyUserName = string.IsNullOrEmpty(UserName);
+        if (!isEmptyUserName || isAuthenticated)
+        {
+            if (isEmptyUserName && isAuthenticated)
+                userId = claims.GetUserId();
+            else
+            {
+                bool isPublicProfile = await UserService.IsPublicProfile(UserName!);
+                bool isItCurrentUser = UserName!.ToLower() == claims?.Identity?.Name?.ToLower();
+                bool isAdmin = claims?.IsInRole(Roles.Admin) ?? false;
+                if (isPublicProfile || isItCurrentUser || isAdmin)
+                    userId = await UserService.GetUserIdByUserNameAsync(UserName!);
+            }
+        }
+
+        if (string.IsNullOrEmpty(userId))
+            NavManager.NavigateTo("/public-resume");
+    }
+}

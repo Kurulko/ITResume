@@ -47,8 +47,8 @@ public class ITResumeContext : IdentityDbContext<User, Role, string>
             new HumanLanguage(){Id = 4, Name = "German"},
         });
 
-        var programmingLanguages = ProgrammingLanguagesInitializer.GetAllProgrammingLanguagesAsync().Result;
-        builder.Entity<ProgrammingLanguage>().HasData(AddValueForId(programmingLanguages));
+        //var programmingLanguages = ProgrammingLanguagesInitializer.GetAllProgrammingLanguagesAsync().Result;
+        //builder.Entity<ProgrammingLanguage>().HasData(AddValueForId(programmingLanguages));
 
         var technologies = TechnologiesInitializer.GetSomeTechnologies();
         builder.Entity<Technology>().HasData(AddValueForId(technologies));

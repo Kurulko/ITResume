@@ -23,7 +23,13 @@ public class APIManager
         var response = await httpClient.GetAsync($"{url}/{path}");
         if (response.IsSuccessStatusCode)
             return response.StatusCode == HttpStatusCode.NoContent ? new() : await response.Content.ReadFromJsonAsync<T>();
-        else
-            throw new Exception(await response.Content.ReadAsStringAsync());
+        throw new Exception(await response.Content.ReadAsStringAsync());
+    }
+    protected async Task<string?> CheckModel(string path)
+    {
+        var response = await httpClient.GetAsync($"{url}/{path}");
+        if (response.IsSuccessStatusCode)
+            return response.StatusCode == HttpStatusCode.NoContent ? string.Empty : await response.Content.ReadAsStringAsync();
+        throw new Exception(await response.Content.ReadAsStringAsync());
     }
 }

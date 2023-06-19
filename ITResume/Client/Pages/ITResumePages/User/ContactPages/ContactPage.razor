@@ -75,5 +75,5 @@
     Contact? contact;
 
     protected override async Task OnInitializedAsync()
-        => contact = await UserService.GetUserContactAsync();
+        => contact = await UserService.GetCurrentUserContactAsync();
 }

@@ -1,0 +1,63 @@
+﻿@page "/public-resume"
+@attribute [AllowAnonymous]
+
+@if (isLoading)
+{
+    <Spinner />
+}
+else
+{
+    <center>
+        <SfGrid DataSource="users" Toolbar="@(new List<string>() { "Search" })" AllowPaging="@isAllowPaging"
+            AllowSorting="isAllowSorting" ClipMode="ClipMode.EllipsisWithTooltip">
+            <GridSortSettings AllowUnsort="false" />
+            <GridEvents CommandClicked="OnCommandClicked" TValue="User" />
+            <GridPageSettings PageSize="PageSize" />
+            <GridColumns>
+                <GridColumn Field=@nameof(User.UserName) />
+                <GridColumn Field=@nameof(User.FirstName) />
+                <GridColumn Field=@nameof(User.LastName) />
+                <GridColumn Field=@nameof(User.FatherName) />
+                <GridColumn Field=@nameof(User.Email) />
+            </GridColumns>
+            <GridColumn>
+                <GridCommandColumns>
+                    <GridCommandColumn ButtonOption="@(new CommandButtonOptions() {
+                            Content = "Look", CssClass = "e-outline" })" />
+                </GridCommandColumns>
+            </GridColumn>
+        </SfGrid>
+    </center>
+}
+
+@code {
+    [Inject]
+    public IUserService UserService { get; set; } = null!;
+
+    [Inject]
+    public NavigationManager NavManager { get; set; } = null!;
+
+    IEnumerable<User>? users;
+
+    bool isLoading = true;
+    protected override async Task OnInitializedAsync()
+    {
+        users = await UserService.GetPublicProfilesAsync();
+        isLoading = false;
+    }
+
+    public void OnCommandClicked(CommandClickEventArgs<User> args)
+    {
+        if (args.CommandColumn.ButtonOption.Content == "Look")
+            NavManager.NavigateTo(args.RowData.UserName);
+    }
+
+    const int PageSize = 50;
+    bool isAllowPaging;
+    bool isAllowSorting;
+    void AssignToIsAllows()
+    {
+        isAllowPaging = users is not null && users.Count() > PageSize;
+        isAllowSorting = users.CountOrDefault() > 1;
+    }
+}
