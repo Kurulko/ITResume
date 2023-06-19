@@ -22,7 +22,7 @@ public abstract class EditComplexDbModels<TModel, TKey> : BaseComponent
     protected bool isAllowPaging;
     protected bool isAllowOperationsWithModels;
 
-    protected virtual int PageSize { get; set; } = 50;
+    protected virtual int PageSize { get; set; } = 20;
 
     protected abstract IDbModelService<TModel, TKey> Service { get; }
 

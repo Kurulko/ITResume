@@ -4,7 +4,7 @@
 <ComplexEditDbModels IdFromModel="@((TModel model) => model.Id)" Service="Service"
                      HeaderTemplate="HeaderTemplate" RowDetails="RowDetails" PrepareModelBeforeSaving="PrepareModelBeforeSaving">
      <GridColumns>
-        <GridColumn Field=@nameof(ITResumeDbModel.Id) AllowAdding="false" />
+        <GridColumn Field=@nameof(ITResumeDbModel.Id) AllowAdding="false" AllowGrouping=false/>
         @Columns
     </GridColumns>
     @ChildContent

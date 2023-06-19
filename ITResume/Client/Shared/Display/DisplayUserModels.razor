@@ -8,7 +8,7 @@
 else if (models.Any())
 {
     <SfGrid DataSource="@models" AllowPaging="isAllowPading">
-        <GridPageSettings PageSize="PageSize" />
+        <GridPageSettings PageSize="@PageSize" />
         <GridTemplates>
             <RowTemplate>
                 <td style="text-align: center">
@@ -96,13 +96,13 @@ else if (models.Any())
     public RenderFragment<TModel> RowBody { get; set; } = null!;
 
     bool isDetails => RowDetails is not null;
-    bool isAllowPading => models is not null && models.Count() > PageSize;
+    bool isAllowPading => models.CountOrDefault() > PageSize;
 
     [Parameter]
     public RenderFragment<TModel>? RowDetails { get; set; }
 
     [CascadingParameter(Name = "PageSize")]
-    public int PageSize { get; set; }
+    public int PageSize { get; set; } = 10;
 
     protected override async Task OnInitializedAsync()
         => models = await GetModels(UserService);

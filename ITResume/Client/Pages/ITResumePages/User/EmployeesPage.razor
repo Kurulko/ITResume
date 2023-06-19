@@ -1,6 +1,9 @@
 ﻿@page "/experience"
 @inherits EditComplexSkillUserITResumeDbModels<Employee>
 
+
+<DisplayNameModels Name="Experience" />
+<br />
 @if (!isDisplay)
 {
     <Spinner />
@@ -14,6 +17,7 @@ else
             <GridEvents OnActionBegin="ActionBeginHandler" TValue="Employee" />
             <GridPageSettings PageSize="PageSize" />
             <GridColumns>
+                <GridColumn Field=@nameof(Employee.Id) AllowAdding="false" AllowGrouping=false />
                 <GridColumn Field=@nameof(Employee.Post) />
                 <GridColumn Field=@nameof(Employee.StartWorking) />
                 <GridColumn Field=@nameof(Employee.FinishWorking) />

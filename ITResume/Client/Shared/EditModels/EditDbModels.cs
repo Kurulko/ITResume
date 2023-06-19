@@ -65,26 +65,29 @@ public abstract class EditDbModels<TModel, TKey> : BaseComponent
         {
             TModel model = Args.Data;
 
-            if (PrepareModelBeforeSaving is not null)
-                model = PrepareModelBeforeSaving(model);
-
-            if (Args.RequestType == Syncfusion.Blazor.Grids.Action.Save)
+            if (model is not null)
             {
-                if (Args.Action == Enums.EditMode.Add.ToString())
-                    await Service.AddModelAsync(model);
-                else
-                    await Service.UpdateModelAsync(model);
+                if (PrepareModelBeforeSaving is not null)
+                    model = PrepareModelBeforeSaving(model);
 
-                await Refresh();
+                if (Args.RequestType == Syncfusion.Blazor.Grids.Action.Save)
+                {
+                    if (Args.Action == Enums.EditMode.Add.ToString())
+                        await Service.AddModelAsync(model);
+                    else
+                        await Service.UpdateModelAsync(model);
 
+                    await Refresh();
+
+                }
+                else if (Args.RequestType == Syncfusion.Blazor.Grids.Action.Delete)
+                {
+                    await Service.DeleteModelAsync(IdFromModel(model));
+                    await Refresh();
+                }
+
+                AssignToIsAllows();
             }
-            else if (Args.RequestType == Syncfusion.Blazor.Grids.Action.Delete)
-            {
-                await Service.DeleteModelAsync(IdFromModel(model));
-                await Refresh();
-            }
-
-            AssignToIsAllows();
         }
         catch (Exception ex)
         {
@@ -92,7 +95,7 @@ public abstract class EditDbModels<TModel, TKey> : BaseComponent
         }
     }
 
-    async Task Refresh()
+    new async Task Refresh()
     {
         await SetModels();
         AssignToIsAllows();
@@ -101,7 +104,7 @@ public abstract class EditDbModels<TModel, TKey> : BaseComponent
 
     void AssignToIsAllows()
     {
-        isAllowPaging = models is not null && models.Count() > PageSize;
+        isAllowPaging = models.CountOrDefault() > PageSize;
         isAllowOperationsWithModels = models.CountOrDefault() > 1;
     }
 

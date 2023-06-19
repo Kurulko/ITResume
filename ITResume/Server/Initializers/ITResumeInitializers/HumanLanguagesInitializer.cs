@@ -14,35 +14,107 @@ namespace ITResume.Server.Initializers.ITResumeInitializers;
 
 public class HumanLanguagesInitializer
 {
-    static string GetEnglishLanguageName(CultureInfo culture)
-    {
-        try
-        {
-            var englishCulture = CultureInfo.GetCultureInfoByIetfLanguageTag("en-US");
-            var englishName = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(culture.NativeName);
+    public static IEnumerable<HumanLanguage> GetSomeHumanLanguages()
+        => languages.Distinct().Select(l => new HumanLanguage() { Name = l });
 
-            if (englishName == culture.DisplayName)
-                englishName = englishCulture.DisplayName;
+    static string[] languages = {
+        "English",
+        "Spanish",
+        "French",
+        "German",
+        "Italian",
+        "Portuguese",
+        "Russian",
+        "Chinese",
+        "Japanese",
+        "Korean",
+        "Arabic",
+        "Hindi",
+        "Bengali",
+        "Punjabi",
+        "Urdu",
+        "Turkish",
+        "Dutch",
+        "Swedish",
+        "Norwegian",
+        "Danish",
+        "Finnish",
+        "Greek",
+        "Polish",
+        "Czech",
+        "Hungarian",
+        "Romanian",
+        "Thai",
+        "Indonesian",
+        "Vietnamese",
+        "Hebrew",
+        "Swahili",
+        "Kiswahili",
+        "Tagalog",
+        "Malay",
+        "Kazakh",
+        "Ukrainian",
+        "Bulgarian",
+        "Slovak",
+        "Slovenian",
+        "Croatian",
+        "Serbian",
+        "Macedonian",
+        "Albanian",
+        "Estonian",
+        "Latvian",
+        "Lithuanian",
+        "Icelandic",
+        "Maltese",
+        "Farsi",
+        "Persian",
+        "Sinhala",
+        "Tamil",
+        "Telugu",
+        "Kannada",
+        "Marathi",
+        "Gujarati",
+        "Odia",
+        "Afrikaans",
+        "Zulu",
+        "Xhosa",
+        "Sotho",
+        "Tswana",
+        "Swazi",
+        "Ndebele",
+        "Sesotho",
+        "Tsonga"
+    };
 
-            return englishName;
-        }
-        catch (CultureNotFoundException)
-        {
-            return culture.DisplayName;
-        }
-    }
+    //static string GetEnglishLanguageName(CultureInfo culture)
+    //{
+    //    try
+    //    {
+    //        var englishCulture = CultureInfo.GetCultureInfoByIetfLanguageTag("en-US");
+    //        var englishName = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(culture.NativeName);
+
+    //        if (englishName == culture.DisplayName)
+    //            englishName = englishCulture.DisplayName;
+
+    //        return englishName;
+    //    }
+    //    catch (CultureNotFoundException)
+    //    {
+    //        return culture.DisplayName;
+    //    }
+    //}
 
 
-    public static IEnumerable<HumanLanguage> GetAllHumanLanguages()
-    {
-        SortedSet<string> languagesStr = new();
+    //public static IEnumerable<HumanLanguage> GetAllHumanLanguages()
+    //{
+    //    SortedSet<string> languagesStr = new();
 
-        foreach (CultureInfo culture in CultureInfo.GetCultures(CultureTypes.AllCultures))
-            if (culture.LCID != CultureInfo.InvariantCulture.LCID && !culture.IsNeutralCulture)
-                languagesStr.Add(GetEnglishLanguageName(culture));
+    //    foreach (CultureInfo culture in CultureInfo.GetCultures(CultureTypes.AllCultures))
+    //        if (culture.LCID != CultureInfo.InvariantCulture.LCID && !culture.IsNeutralCulture)
+    //            languagesStr.Add(GetEnglishLanguageName(culture));
 
 
-        IEnumerable<HumanLanguage> languages = languagesStr.Distinct().Select(languageStr => new HumanLanguage() { Name = languageStr });
-        return languages;
-    }
+    //    IEnumerable<HumanLanguage> languages = languagesStr.Distinct().Select(languageStr => new HumanLanguage() { Name = languageStr });
+    //    return languages;
+    //}
 }

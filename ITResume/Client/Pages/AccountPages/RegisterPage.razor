@@ -1,8 +1,7 @@
 ﻿@page "/register"
-@layout AccountLayout
 
-<h3 class="text-left">@AccountMode.Register</h3>
-<hr /><br />
+<DisplayNameModels Name="@AccountMode.Register.ToString()" />
+<br />
 <AccountPage AccountMode="AccountMode.Register" AccountModel="model" DoAction="Register" >
     <div class="form-group">
         <DisplayName For="@(() => model.Name)" />

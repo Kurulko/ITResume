@@ -1,8 +1,6 @@
 ﻿@page "/login"
-@layout AccountLayout
 
-<h3 class="text-left">@AccountMode.Login</h3>
-<hr />
+<DisplayNameModels Name="@AccountMode.Login.ToString()" />
 <br />
 <AccountPage AccountMode="AccountMode.Login" AccountModel="model" DoAction="Login">
     <div class="form-group">

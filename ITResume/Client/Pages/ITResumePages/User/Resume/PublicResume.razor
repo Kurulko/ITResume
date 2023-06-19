@@ -1,6 +1,8 @@
 ﻿@page "/public-resume"
 @attribute [AllowAnonymous]
 
+<DisplayNameModels Name="Public Resume" />
+<br />
 @if (isLoading)
 {
     <Spinner />
@@ -19,13 +21,13 @@ else
                 <GridColumn Field=@nameof(User.LastName) />
                 <GridColumn Field=@nameof(User.FatherName) />
                 <GridColumn Field=@nameof(User.Email) />
+                <GridColumn>
+                    <GridCommandColumns>
+                        <GridCommandColumn ButtonOption="@(new CommandButtonOptions() {
+                                Content = "Look", CssClass = "e-outline" })" />
+                    </GridCommandColumns>
+                </GridColumn>
             </GridColumns>
-            <GridColumn>
-                <GridCommandColumns>
-                    <GridCommandColumn ButtonOption="@(new CommandButtonOptions() {
-                            Content = "Look", CssClass = "e-outline" })" />
-                </GridCommandColumns>
-            </GridColumn>
         </SfGrid>
     </center>
 }
@@ -49,7 +51,7 @@ else
     public void OnCommandClicked(CommandClickEventArgs<User> args)
     {
         if (args.CommandColumn.ButtonOption.Content == "Look")
-            NavManager.NavigateTo(args.RowData.UserName);
+            NavManager.NavigateTo($"public-resume/{args.RowData.UserName}");
     }
 
     const int PageSize = 50;

@@ -3,7 +3,7 @@
 
 <SimpleEditDbModels IdFromModel="@((TModel model) => model.Id)" Service="Service" RowDetails="RowDetails" PrepareModelBeforeSaving="PrepareModelBeforeSaving">
      <GridColumns>
-        <GridColumn Field=@nameof(ITResumeDbModel.Id) AllowAdding="false" />
+        <GridColumn Field=@nameof(ITResumeDbModel.Id) AllowAdding="false" AllowGrouping=false />
         @Columns
     </GridColumns>
     @ChildContent

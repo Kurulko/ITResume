@@ -1,6 +1,9 @@
 ﻿@page "/foreign-languages"
 @inherits EditComplexITResumeDbModels<ForeignLanguage>
 
+
+<DisplayNameModels Name="Foreign Languages" />
+<br />
 @if (!isDisplay)
 {
     <Spinner />
@@ -15,6 +18,7 @@ else
                 <GridEvents OnActionBegin="ActionBeginHandler" TValue="ForeignLanguage" />
                 <GridPageSettings PageSize="PageSize" />
                 <GridColumns>
+                    <GridColumn Field=@nameof(ForeignLanguage.Id) AllowAdding="false" AllowGrouping=false />
                     <GridColumn Field=@nameof(ForeignLanguage.HumanLanguageId) HeaderText="Name">
                         <Template>
                             @(((ForeignLanguage)context)!.HumanLanguage?.Name)

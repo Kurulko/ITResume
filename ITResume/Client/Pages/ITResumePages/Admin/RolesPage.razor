@@ -1,6 +1,8 @@
 ﻿@page "/roles"
 @inherits _AdminLayout
 
+<DisplayNameModels Name="Roles" />
+<br />
 <CascadingValue Value="30" Name="PageSize">
     <SimpleEditDbModels Service="RoleService" TModel="Role" TKey="string" Context="role">
         <ChildContent>

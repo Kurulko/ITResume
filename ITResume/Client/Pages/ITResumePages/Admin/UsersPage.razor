@@ -3,6 +3,8 @@
 @inherits EditComplexDbModels<User, string>
 @attribute [Authorize(Roles = Roles.Admin)]
 
+<DisplayNameModels Name="Users" />
+<br />
 @if (!isDisplay)
 {
     <Spinner />

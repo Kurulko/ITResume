@@ -1,6 +1,8 @@
 ﻿@page "/countries"
 @inherits _AdminLayout
 
+<DisplayNameModels Name="Countries" />
+<br />
 <CascadingValue Value="50" Name="PageSize">
     <SimpleEditITResumeDbModels Service="CountryService" TModel="Country">
         <Columns>

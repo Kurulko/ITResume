@@ -11,7 +11,7 @@ else
 {
     <h1>@(!isEmptyUserName ? @$"{UserName}'s" : "Your") resume:</h1>
     <br />
-    <CascadingValue Value="10" Name="PageSize">
+    <CascadingValue Value="5" Name="PageSize">
         <CascadingValue Value="false" Name="IsAllowChanging">
             <center>
                 <div class="row" style="width: 50%;">
@@ -200,10 +200,17 @@ else
         var claims = (await AuthStateTask).User;
         bool isAuthenticated = claims.Identity?.IsAuthenticated ?? false;
         isEmptyUserName = string.IsNullOrEmpty(UserName);
+
         if (!isEmptyUserName || isAuthenticated)
         {
             if (isEmptyUserName && isAuthenticated)
-                userId = claims.GetUserId();
+            {
+                string _userId = claims.GetUserId();
+                bool isImpersonating = await UserService.IsImpersonating(_userId);
+                if (isImpersonating)
+                    _userId = (await UserService.GetModelByIdAsync(_userId))!.UsedUserId!;
+                userId = _userId;
+            }
             else
             {
                 bool isPublicProfile = await UserService.IsPublicProfile(UserName!);

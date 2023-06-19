@@ -37,18 +37,11 @@ public class ITResumeContext : IdentityDbContext<User, Role, string>
         var countries = CountriesInitializer.GetAllCountries();
         builder.Entity<Country>().HasData(AddValueForId(countries));
 
-        //var humanLanguages = HumanLanguagesInitializer.GetAllHumanLanguages();
-        //builder.Entity<HumanLanguage>().HasData(AddValueForId(humanLanguages));
-        builder.Entity<HumanLanguage>().HasData(new List<HumanLanguage>()
-        {
-            new HumanLanguage(){Id = 1, Name = "English"},
-            new HumanLanguage(){Id = 2, Name = "Ukrainian"},
-            new HumanLanguage(){Id = 3, Name = "Russian"},
-            new HumanLanguage(){Id = 4, Name = "German"},
-        });
+        var humanLanguages = HumanLanguagesInitializer.GetSomeHumanLanguages();
+        builder.Entity<HumanLanguage>().HasData(AddValueForId(humanLanguages));
 
-        //var programmingLanguages = ProgrammingLanguagesInitializer.GetAllProgrammingLanguagesAsync().Result;
-        //builder.Entity<ProgrammingLanguage>().HasData(AddValueForId(programmingLanguages));
+        var programmingLanguages = ProgrammingLanguagesInitializer.GetAllProgrammingLanguagesAsync().Result;
+        builder.Entity<ProgrammingLanguage>().HasData(AddValueForId(programmingLanguages));
 
         var technologies = TechnologiesInitializer.GetSomeTechnologies();
         builder.Entity<Technology>().HasData(AddValueForId(technologies));

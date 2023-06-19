@@ -18,6 +18,7 @@
                 ("oi oi-list-rich", "projects", "Projects"),
                 ("oi oi-list-rich", "contact", "Contact"),
             };
+
     IEnumerable<(string cssClass, string href, string name)> adminLinks = new List<(string, string, string)>() {
                 ("oi oi-list-rich", "users", "Users"),
                 ("oi oi-list-rich", "roles", "Roles"),
@@ -28,9 +29,24 @@
                 ("oi oi-list-rich", "companies", "Companies"),
             };
 
+    IEnumerable<(string cssClass, string href, string name)> accountLinks = new List<(string, string, string)>() {
+                ("oi oi-list-rich", "public-resume", "Profiles"),
+                ("oi oi-person", "login", "Login"),
+                ("oi oi-account-login","register", "Register")
+            };
+
     protected override async Task OnParametersSetAsync()
     {
-        bool isAdmin = (await authStateTask).User.IsInRole(Roles.Admin);
-        links = isAdmin ? userLinks.Union(adminLinks) : userLinks;
+        var claims = (await authStateTask).User;
+        bool isAuthenticated = claims?.Identity?.IsAuthenticated ?? false;
+        if (isAuthenticated)
+        {
+            bool isAdmin = claims!.IsInRole(Roles.Admin);
+            links = isAdmin ? userLinks.Union(adminLinks) : userLinks;
+        }
+        else
+        {
+            links = accountLinks;
+        }
     }
 }

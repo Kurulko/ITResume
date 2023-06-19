@@ -21,7 +21,6 @@ public class Contact : UserITResumeDbModel
     [EmailAddress]
     public string? Email { get; set; }
 
-    [Url]
     public string? Telegram { get; set; }
 
     [Url]

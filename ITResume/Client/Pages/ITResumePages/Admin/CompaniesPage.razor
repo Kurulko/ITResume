@@ -1,6 +1,8 @@
 ﻿@page "/companies"
 @inherits _AdminLayout
 
+<DisplayNameModels Name="Companies" />
+<br />
 <CascadingValue Value="50" Name="PageSize">
     <ComplexEditITResumeDbModels Service="CompanyService" TModel="Company" PrepareModelBeforeSaving="PrepareModelBeforeSaving">
         <Columns>

@@ -1,12 +1,15 @@
 ﻿@page "/achievements"
 @inherits _UserLayout
 
+<DisplayNameModels Name="Achievements" />
+<br />
 <CascadingValue Value="10" Name="PageSize">
     <ComplexEditUserITResumeDbModels Service="AchievementService" TModel="Achievement" Context="achievement" GetModels="@(us => us.GetCurrentUserAchievementsAsync())">
         <Columns>
             <GridColumn Field=@nameof(Achievement.Name) />
             <GridColumn Field=@nameof(Achievement.Link) />
             <GridColumn Field=@nameof(Achievement.When) />
+            <GridColumn Field=@nameof(Achievement.Description) />
         </Columns>
         <RowDetails>
             <td colspan="4">@achievement.Description</td>

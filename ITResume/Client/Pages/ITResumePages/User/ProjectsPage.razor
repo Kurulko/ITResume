@@ -2,6 +2,8 @@
 @inherits EditComplexSkillUserITResumeDbModels<Project>
 
 
+<DisplayNameModels Name="Projects" />
+<br />
 @if (!isDisplay)
 {
     <Spinner />
@@ -15,6 +17,7 @@ else
             <GridEvents OnActionBegin="ActionBeginHandler" TValue="Project" />
             <GridPageSettings PageSize="PageSize" />
             <GridColumns>
+                <GridColumn Field=@nameof(Project.Id) AllowAdding="false" AllowGrouping=false />
                 <GridColumn Field=@nameof(Project.Name) />
                 <GridColumn Field=@nameof(Project.Github) />
                 <GridColumn Field=@nameof(Project.WorkExample) />
@@ -35,7 +38,7 @@ else
                             Project project = context as Project ?? new();
                             List<string>? programmingLanguagesStr = project.ProgrammingLanguages?.SelectName()?.ToList();
                             async Task ValueChanged(IEnumerable<string>? programmingLanguagesStr)
-                                => project.ProgrammingLanguages = allLanguages!.WhereNameContainsInStrCollection(programmingLanguagesStr);
+                            => project.ProgrammingLanguages = allLanguages!.WhereNameContainsInStrCollection(programmingLanguagesStr);
                         }
                         <MultiSelect AllItems="allLanguagesStr" CurrentValues="programmingLanguagesStr" CurrentValuesChanged="ValueChanged"
                                  Placeholder="Languages" Title="Languages" />
@@ -50,7 +53,7 @@ else
                             Project project = context as Project ?? new();
                             List<string>? technologiesStr = project.Technologies?.SelectName()?.ToList();
                             async Task ValueChanged(IEnumerable<string>? technologiesStr)
-                                => project.Technologies = allTechnologies!.WhereNameContainsInStrCollection(technologiesStr);
+                            => project.Technologies = allTechnologies!.WhereNameContainsInStrCollection(technologiesStr);
                         }
                         <MultiSelect AllItems="allTechnologiesStr" CurrentValues="technologiesStr" CurrentValuesChanged="ValueChanged"
                                  Placeholder="Technologies" Title="Technologies" />

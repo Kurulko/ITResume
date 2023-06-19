@@ -1,9 +1,21 @@
 ﻿@page "/educations"
-@inherits _UserLayout
+@inherits EditComplexITResumeDbModels<Education>
 
-<CascadingValue Value="5" Name="PageSize">
-    <ComplexEditUserITResumeDbModels Service="EducationService" TModel="Education" GetModels="@(us => us.GetCurrentUserEducationsAsync())">
-        <Columns>
+<DisplayNameModels Name="Educations" />
+<br />
+@if (!isDisplay)
+{
+    <Spinner />
+}
+else
+{
+    <ShowError Error="@error">
+        <SfGrid @ref="modelGrid" DataSource="models" Toolbar="@GetToolbar()" AllowPaging="@isAllowPaging"
+            AllowSorting="isAllowOperationsWithModels" AllowGrouping="isAllowOperationsWithModels" ClipMode="ClipMode.EllipsisWithTooltip">
+            <ComplexEditDbModelsSettings />
+            <GridEvents OnActionBegin="ActionBeginHandler" TValue="Education" />
+            <GridPageSettings PageSize="PageSize" />
+            <GridColumns>
             <GridColumn Field=@nameof(Education.University) />
             <GridColumn Field=@nameof(Education.Faculty) />
             <GridColumn Field=@nameof(Education.Specialty) />
@@ -23,9 +35,10 @@
             </GridColumn>
             <GridColumn Field=@nameof(Education.StartEducation) />
             <GridColumn Field=@nameof(Education.FinishEducation) />
-        </Columns>
-    </ComplexEditUserITResumeDbModels>
-</CascadingValue>
+            </GridColumns>
+        </SfGrid>
+    </ShowError>
+}
 
 
 @code {
@@ -35,6 +48,11 @@
     [Inject]
     public IEducationService EducationService { get; set; } = null!;
 
-    [Parameter]
-    public int PageSize { get; set; }
+    [Inject]
+    public IUserService UserService { get; set; } = null!;
+
+    protected override async Task<IEnumerable<Education>> GetModels()
+        => await UserService.GetCurrentUserEducationsAsync();
+
+    protected override IDbModelService<Education, long> Service => EducationService;
 }
