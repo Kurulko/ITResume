@@ -44,12 +44,16 @@ public class UserManager : IUserService
 
     public async Task UpdateModelAsync(User model)
     {
-        db.Entry(model).State = EntityState.Modified;
 
         var userDetails = model.UserDetails;
         if (userDetails is not null)
-            db.Entry(userDetails).State = EntityState.Modified;
+        {
+            db.UsersDetails.Update(userDetails);
+            await db.SaveChangesAsync();
+        }
+        //db.Entry(userDetails).State = EntityState.Modified;
 
+        db.Entry(model).State = EntityState.Modified;
         await db.SaveChangesAsync();
     }
 
